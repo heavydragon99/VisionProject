@@ -27,6 +27,7 @@ def __gatherLines(allLines,rhoOffset,thetaOffset):
         allLines = np.delete(allLines, indices_to_remove, axis=0)
         return allLines
 
+
 def checkSideLines(edges):
 
     #hough
@@ -48,7 +49,7 @@ def checkSideLines(edges):
     # right side
     linesR = cv2.HoughLines(edges, rho=rhoVar, theta=thetaVar, threshold=thresholdVar,
                             min_theta=minThetaR, max_theta=maxThetaR)
-
+    allLines = None
     #check of left and right lines are found
     if(linesL is not None and linesR is not None):
         allLines = np.concatenate((linesL, linesR))
@@ -61,7 +62,7 @@ def checkSideLines(edges):
     rhoOffset = 10
     thetaOffset = 0.04
 
-    if(len(allLines) != 0):
+    if(allLines is not None):
     # delete lines that are to close to each other
         allLines = __gatherLines(allLines,rhoOffset,thetaOffset)
     #initializing lineXValues as array
@@ -121,6 +122,11 @@ def checkSideLines(edges):
                      correction = 160 - middle
                      return correction
             # more then 4 lines
+            elif(len(lineXValues) == 2 and linesL is not None and linesR is not None):
+                print("2 lines 1l 1r")
+                middle = lineXValues[0] + lineXValues[1] / 2
+                correction = 160 - middle
+                return correction
             elif(len(lineXValues) > 4):
                 print("to many lines")
                 return -999
@@ -157,7 +163,7 @@ def checkIntesections(edges):
                     found_match = True
                     break
             i += 1
-        print("intersection found?: " + str(found_match))
+        
 
         # used for visualising on image (testing or for visualizing)
         for line in allLines:
@@ -171,21 +177,81 @@ def checkIntesections(edges):
 
            
             # used for visualising on image (testing or for visualizing)
-            x1 = int(x0 + 1000*(-b))
-            y1 = int(y0 + 1000*(a))
-            x2 = int(x0 - 1000*(-b))
-            y2 = int(y0 - 1000*(a))
-            cv2.line(gray_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            # x1 = int(x0 + 1000*(-b))
+            # y1 = int(y0 + 1000*(a))
+            # x2 = int(x0 - 1000*(-b))
+            # y2 = int(y0 - 1000*(a))
+            # cv2.line(gray_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
         # visualising variable(testing or for visualizing)
         cv2.imshow('Canny Edges', edges)
         cv2.imshow('Image from Socket', gray_img)
 
         return found_match
 
+def checkCorner(edges):
+    #hough
+    rhoVar= 0.5              #the distance resolution of the accumulator in pixels. It determines the distance resolution of the detected lines.
+    thetaVar =(np.pi/180)*0.1#the angle resolution of the accumulator in radians. It determines the angular resolution of the detected lines.
+    thresholdVar=60          #the minimum number of votes (intersections in Hough space) required for a line to be detected. The higher the threshold, the fewer lines will be detected.
+    
+    #left
+    minTheta =(np.pi/180)*70    # Beginning angel of hough (70 degrees)
+    maxTheta =(np.pi/180)*110   # ending angel of hough (110 degrees)
+
+    allLines = cv2.HoughLines(edges, rho=rhoVar, theta=thetaVar, threshold=thresholdVar,
+                        min_theta=minTheta, max_theta=maxTheta)
+    
+    rhoOffset = 7.5
+    thetaOffset = 0.021
+
+    if(allLines is not None):
+        allLines = __gatherLines(allLines,rhoOffset,thetaOffset)
+        for line in allLines:
+            rho, theta = line[0]
+            # Change values to values for calculating lines
+            a = np.cos(theta)
+            b = np.sin(theta)
+            x0 = a * rho
+            y0 = b * rho
+            # used for visualising on image (testing or for visualizing)
+            x1 = int(x0 + 1000*(-b))
+            y1 = int(y0 + 1000*(a))
+            x2 = int(x0 - 1000*(-b))
+            y2 = int(y0 - 1000*(a))
+            cv2.line(gray_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.imshow('Canny Edges', edges)
+        cv2.imshow('Image from Socket', gray_img)
+
+        
+        if(len(allLines) >= 2):
+            thetas = []
+            for line in allLines:
+                a = line[0][1]
+                thetas.append(a)
+            theta_mean = np.mean(thetas)
+            theta_margin = 0.2
+            filtered_lines = []
+            for line in allLines:
+                a = line[0][1]
+                if abs(a - theta_mean) < theta_margin:
+                    b = line[0][0]
+                    sin_theta = np.sin(a)
+                    cos_theta = np.cos(a)
+                    y = (b - 160*cos_theta) / sin_theta
+                    filtered_lines.append(y)
+            if filtered_lines:
+                distance = 140 - np.mean(filtered_lines)
+            else:
+                distance = None
+            return True, distance
+        else:
+            return False, None
+    else:
+        return False, None
 
 
 # Load image
-img = readImage('C:\\VisionProject\\Pictures\\WegPlusBorden\\00038.jpg',cv2.ROTATE_180)
+img = readImage('C:\\VisionProject\\Pictures\\WegPlusBorden\\00041.jpg',cv2.ROTATE_180)
 img = cropImage(img,140,0)
 gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # temp
 
@@ -197,7 +263,9 @@ edges = cv2.Canny(img, lowTreshold, highTreshold, sobelKernel)
 
 
 correction = checkSideLines(edges)
-if(correction == -999):
+if(correction == None):
+    print("no line/not enough lines detected")
+elif(correction == -999):
     print("error")
 elif(correction < -5):
     print("right")
@@ -206,8 +274,9 @@ elif(correction > 5):
 else:
     print("straight")
 
-checkIntesections(edges)
 
+print("intersection found?: " + str(checkIntesections(edges)))
+print("Corner found?: " + str(checkCorner(edges)))
 cv2.waitKey(0)
 
 cv2.destroyAllWindows()
