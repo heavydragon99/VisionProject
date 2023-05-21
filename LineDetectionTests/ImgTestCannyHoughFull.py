@@ -95,14 +95,14 @@ def checkSides(middleOfScreen,edges,usableImageHeight):
         b = np.sin(theta)
         x0 = a * rho
         y0 = b * rho 
-        # Calculate the x-value of the point where the line intersects the bottom edge of the image.
-        # 1. Get the height of the image.
-        # 2. Get the y-coordinate of the point where the line intersects the y-axis.
-        # 3. Calculate the distance from y0 to the bottom edge of the image, minus 1 to account for 0-based indexing.
-        # 4. Calculate the slope of the line, which is the negative of the tangent of theta (since a = cos(theta) and b = sin(theta)).
-        # 5. Calculate the vertical distance from y0 to the bottom edge of the image, multiplied by the slope of the line, which gives the horizontal distance from the y-axis to the point where the line intersects the bottom edge of the image.
-        # 6. Get the x-coordinate of the point where the line intersects the y-axis.
-        # 7. Add the horizontal distance from the y-axis to the point where the line intersects the bottom edge of the image to the x-coordinate of the point where the line intersects the y-axis. This gives the x-coordinate of the point where the line intersects the bottom edge of the image.
+        # calculate the x-value of the point where the line intersects the bottom edge of the image.
+        # 1. get the height of the image.
+        # 2. get the y-coordinate of the point where the line intersects the y-axis.
+        # 3. calculate the distance from y0 to the bottom edge of the image, minus 1 to account for 0-based indexing.
+        # 4. calculate the slope of the line, which is the negative of the tangent of theta (since a = cos(theta) and b = sin(theta)).
+        # 5. calculate the vertical distance from y0 to the bottom edge of the image, multiplied by the slope of the line, which gives the horizontal distance from the y-axis to the point where the line intersects the bottom edge of the image.
+        # 6. get the x-coordinate of the point where the line intersects the y-axis.
+        # 7. add the horizontal distance from the y-axis to the point where the line intersects the bottom edge of the image to the x-coordinate of the point where the line intersects the y-axis. This gives the x-coordinate of the point where the line intersects the bottom edge of the image.
         cvalueTest = int(x0 + (gray_img.shape[0]-y0-1)*(-b)/a) 
         lineXValues.append(cvalueTest)
 
@@ -200,7 +200,7 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
             downTIntersection = False
             leftCorner = False
     else:
-        ourwayIntersection = False
+        fourwayIntersection = False
         leftTIntersection = False
         downTIntersection = False
         leftCorner = False
@@ -296,15 +296,10 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
 
 # Load image
 #img = readImage('C:\\VisionProject\\Pictures\\WegFout(Test)\\rtIntersection\\00005.jpg',cv2.ROTATE_180)
-img = readImage('C:\\VisionProject\\Pictures\\WegPlusBorden\\00060.jpg',cv2.ROTATE_180)
+img = readImage('C:\\VisionProject\\Pictures\\WegPlusBorden\\00016.jpg',cv2.ROTATE_180)
 
 gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # temp
-
-
-# Creating the kernel(2d convolution matrix)
-kernel1 = np.ones((3, 3), np.float32)/9
   
-
 gray_blur_img = cv2.GaussianBlur(gray_img,(3,3),0)
 
 

@@ -7,7 +7,7 @@ def readImage(imgpath,rotateValue):
     return img
 
 # Load image
-image = readImage('C:\\VisionProject\\Pictures\\WegPlusBorden\\00038.jpg',cv2.ROTATE_180)
+image = readImage('C:\\VisionProject\\Pictures\\WegPlusBorden\\00017.jpg',cv2.ROTATE_180)
 # Convert to grayscale
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
