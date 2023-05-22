@@ -68,8 +68,8 @@ def __checkRoadForLines(edges,rhoVar,thetaVar,minTheta,maxTheta,thresholdVar,rho
 def checkSides(middleOfScreen,edges,usableImageHeight):
     #uses 2 times hough
     edges = __cropImage(edges,usableImageHeight,0,0,0)
-    linesLeft = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*2,minTheta =(np.pi/180)*0,maxTheta =(np.pi/180)*80,thresholdVar=60,rhoOffset = 10,thetaOffset = 0.07)
-    linesRight = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*2,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*180,thresholdVar=60,rhoOffset = 10,thetaOffset = 0.07)
+    linesLeft = __checkRoadForLines(edges,rhoVar=1,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=60,rhoOffset = 21,thetaOffset = 0.5)
+    linesRight = __checkRoadForLines(edges,rhoVar=1,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*190,thresholdVar=60,rhoOffset = 21,thetaOffset = 0.5)
     allLines = None
     #check of left and right lines are found
     if(linesLeft is not None and linesRight is not None):
@@ -78,11 +78,15 @@ def checkSides(middleOfScreen,edges,usableImageHeight):
         allLines = linesLeft
     elif(linesRight is not None):
         allLines = linesRight
+    else:
+        return -999
     
-    
+    print(str(linesLeft))
+    print("--")
+    print(str(linesRight))
 
     # visualize
-    #__drawLines(allLines);
+    __drawLines(allLines);
     # end visualize
 
     #initialize variable
@@ -149,7 +153,7 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
     #uses 6 thimes Hough
     edges = __cropImage(edges,usableImageHeight,0,0,0)
     # get lines to check if there is an intersection 
-    lines = __checkRoadForLines(edges,rhoVar=0.7,thetaVar =(np.pi/180)*0.5,minTheta =(np.pi/180)*70,maxTheta =(np.pi/180)*110,thresholdVar=60,rhoOffset = 8,thetaOffset = 0.04)
+    lines = __checkRoadForLines(edges,rhoVar=1,thetaVar =(np.pi/180)*1,minTheta =(np.pi/180)*70,maxTheta =(np.pi/180)*110,thresholdVar=100,rhoOffset = 0,thetaOffset = 0.04)
     
     #return when no intersectio or corner in detected
     if(lines is None):
@@ -296,11 +300,19 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
 
 # Load image
 #img = readImage('C:\\VisionProject\\Pictures\\WegFout(Test)\\rtIntersection\\00005.jpg',cv2.ROTATE_180)
-img = readImage('C:\\VisionProject\\Pictures\\WegPlusBorden\\00016.jpg',cv2.ROTATE_180)
+#img = readImage('C:\\VisionProject\\Pictures\\WegPlusBorden\\00016.jpg',cv2.ROTATE_180)
+
+#begin 8
+#9
+#13
+#15-20
+#21?
+#22-29
+img = readImage('C:\\VisionProject\\Pictures\\HVGA\\Weg\\00029.jpg',cv2.ROTATE_180)
 
 gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # temp
   
-gray_blur_img = cv2.GaussianBlur(gray_img,(3,3),0)
+gray_blur_img = cv2.GaussianBlur(gray_img,(5,5),0)
 
 
  #canny
@@ -308,18 +320,25 @@ lowTreshold=100             #Any gradient values below this threshold are consid
 highTreshold=200            #Any gradient values above this threshold are considered as edges.
 sobelKernel=apertureSize=3  #the size of the Sobel kernel used for gradient computation. It is an optional argument with a default value of 3.
 edges = cv2.Canny(gray_blur_img, lowTreshold, highTreshold, sobelKernel)
+#cv2.imshow('edges', edges)
+
 
 #only for visualizing
-gray_img = __cropImage(gray_img,140,0,0,0)
+gray_img = __cropImage(gray_img,180,0,0,0)
 cv2.imshow('Image from Socket', gray_img)
 # end only for visualizing 
 
-correction = checkSides(middleOfScreen=160,edges=edges,usableImageHeight=140)
+usableHeight = 180
+imageWidth = 480
+
+correction = checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight)
 
 #only for visualizing
 #edges = __cropImage(edges,140,0,0,0)
 #cv2.imshow('Edges', edges)
 # end only for visualizing 
+
+
 
 
 print(correction)
@@ -334,7 +353,7 @@ elif(correction > 20):
 else:
     print("straight")
 
-print(checkIntersections(edges=edges,usableImageHeight=140,imageWidth=320))
+print(checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth))
 
 cv2.waitKey(0)
 
