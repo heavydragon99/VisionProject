@@ -21,7 +21,6 @@ def __drawLines(lines):
         cv2.imshow('Image from Socket', gray_img)
     # end visualize 
 
-
 def readImage(imgpath,rotateValue):
     img = cv2.imread(imgpath)
     img = cv2.rotate(img, rotateValue)
@@ -67,9 +66,15 @@ def __checkRoadForLines(edges,rhoVar,thetaVar,minTheta,maxTheta,thresholdVar,rho
 
 def checkSides(middleOfScreen,edges,usableImageHeight):
     #uses 2 times hough
+
+    #rho 1
+    # 2 graden
+    # 60 thresh
+
+
     edges = __cropImage(edges,usableImageHeight,0,0,0)
-    linesLeft = __checkRoadForLines(edges,rhoVar=1,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=60,rhoOffset = 21,thetaOffset = 0.5)
-    linesRight = __checkRoadForLines(edges,rhoVar=1,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*190,thresholdVar=60,rhoOffset = 21,thetaOffset = 0.5)
+    linesLeft = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=55,rhoOffset = 21,thetaOffset = 0.5)
+    linesRight = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*190,thresholdVar=55,rhoOffset = 21,thetaOffset = 0.5)
     allLines = None
     #check of left and right lines are found
     if(linesLeft is not None and linesRight is not None):
@@ -86,7 +91,7 @@ def checkSides(middleOfScreen,edges,usableImageHeight):
     print(str(linesRight))
 
     # visualize
-    __drawLines(allLines);
+    #__drawLines(allLines);
     # end visualize
 
     #initialize variable
@@ -151,10 +156,10 @@ def checkSides(middleOfScreen,edges,usableImageHeight):
     
 def checkIntersections(edges,usableImageHeight,imageWidth):
     #uses 6 thimes Hough
-    edges = __cropImage(edges,usableImageHeight,0,0,0)
+    edges = __cropImage(edges,usableImageHeight,60,0,0)
     # get lines to check if there is an intersection 
-    lines = __checkRoadForLines(edges,rhoVar=1,thetaVar =(np.pi/180)*1,minTheta =(np.pi/180)*70,maxTheta =(np.pi/180)*110,thresholdVar=100,rhoOffset = 0,thetaOffset = 0.04)
-    
+    lines = __checkRoadForLines(edges,rhoVar=1,thetaVar =(np.pi/180)*1,minTheta =(np.pi/180)*70,maxTheta =(np.pi/180)*110,thresholdVar=80,rhoOffset = 5,thetaOffset = 0.04)
+   
     #return when no intersectio or corner in detected
     if(lines is None):
         return "no intersection"
@@ -176,7 +181,8 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
     leftCorner = True
 
     #check left side for verical lines to determine the X value
-    linesLeft = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*2,minTheta =(np.pi/180)*0,maxTheta =(np.pi/180)*80,thresholdVar=60,rhoOffset = 10,thetaOffset = 0.07)
+    linesLeft = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=55,rhoOffset = 21,thetaOffset = 0.5)
+
     # visualize
     #__drawLines(linesLeft)
     # end visualize 
@@ -219,16 +225,18 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
         x0 = a * rho
         y0 = b * rho
         if(yHigh > y0):
-            yHigh = y0
-    #print("yHigh: "+ str(yHigh))
+            yHigh = (y0-5)
+            #TODO -5 test offset
+
 
     # visualize
     #__drawLines(IntersectionLeft)
     # end visualize 
    
     upImage = __cropImage(edges,0,0,100-yHigh,0)
-    IntersectionUpLeft = __checkRoadForLines(upImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.5,minTheta =(np.pi/180)*0,maxTheta =(np.pi/180)*80,thresholdVar=25,rhoOffset = 7.5,thetaOffset = 0.03)
-    IntersectionUpRight = __checkRoadForLines(upImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.5,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*180,thresholdVar=25,rhoOffset = 7.5,thetaOffset = 0.03)
+    #cv2.imshow("test",upImage)
+    IntersectionUpLeft = __checkRoadForLines(upImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.5,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=20,rhoOffset = 7.5,thetaOffset = 0.03)
+    IntersectionUpRight = __checkRoadForLines(upImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.5,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*190,thresholdVar=20,rhoOffset = 7.5,thetaOffset = 0.03)
     if(IntersectionUpLeft is None or IntersectionUpRight is None):
         fourwayIntersection = False
         leftTIntersection = False
@@ -262,8 +270,8 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
         #print("xLow: "+ str(xLow))
         rightImage = __cropImage(edges,0,imageWidth-xLow,0,0)
         #cv2.imshow('rightImage', rightImage)
-        IntersectionRight = __checkRoadForLines(rightImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.1,minTheta =(np.pi/180)*70,maxTheta =(np.pi/180)*110,thresholdVar=25,rhoOffset = 7.5,thetaOffset = 0.03)
-        
+        IntersectionRight = __checkRoadForLines(rightImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.1,minTheta =(np.pi/180)*70,maxTheta =(np.pi/180)*110,thresholdVar=25,rhoOffset = 7.5,thetaOffset = 0.07)
+        #print(str(IntersectionRight))
         # visualize
         #__drawLines(IntersectionRight)
         # end visualize 
@@ -302,13 +310,31 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
 #img = readImage('C:\\VisionProject\\Pictures\\WegFout(Test)\\rtIntersection\\00005.jpg',cv2.ROTATE_180)
 #img = readImage('C:\\VisionProject\\Pictures\\WegPlusBorden\\00016.jpg',cv2.ROTATE_180)
 
+#18 is sort of oke
+#line
 #begin 8
 #9
 #13
 #15-20
-#21?
-#22-29
-img = readImage('C:\\VisionProject\\Pictures\\HVGA\\Weg\\00029.jpg',cv2.ROTATE_180)
+#21-29
+#31
+#33
+#35-38
+# 39 check threshold
+#40-44
+
+#intersection
+#begin 9
+#13
+#15-20
+#21-29
+#31
+#33
+#35-38
+# 39
+#40-44
+
+img = readImage('C:\\VisionProject\\Pictures\\HVGA\\Weg\\00044.jpg',cv2.ROTATE_180)
 
 gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # temp
   
@@ -324,12 +350,12 @@ edges = cv2.Canny(gray_blur_img, lowTreshold, highTreshold, sobelKernel)
 
 
 #only for visualizing
-gray_img = __cropImage(gray_img,180,0,0,0)
+gray_img = __cropImage(gray_img,180,60,0,0)
 cv2.imshow('Image from Socket', gray_img)
 # end only for visualizing 
 
-usableHeight = 180
-imageWidth = 480
+usableHeight = 185
+imageWidth = 420
 
 correction = checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight)
 
