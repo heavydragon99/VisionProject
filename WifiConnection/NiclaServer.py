@@ -1,7 +1,7 @@
 import sensor, image, time, network, socket, sys
 
-SSID='TMNL-519EF1'      # Network SSID
-KEY='EW63KQB76MQDB8AG'       # Network key
+SSID='NoName'      # Network SSID
+KEY='Ab123456'       # Network key
 HOST =''     # Use first available interface
 PORT = 8080  # Arbitrary non-privileged port
 imgCompression = 80 #jpeg image compression

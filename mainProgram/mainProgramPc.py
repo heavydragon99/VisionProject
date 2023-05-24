@@ -1,3 +1,4 @@
+#from roadDetection import checkIntersections,checkSides
 import roadDetection
 import cv2
 import numpy as np
@@ -6,7 +7,7 @@ import socket
 
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.1.104'
+IP_ADDRESS = '192.168.137.104'
 PORT = 8080
 
 # Create socket object
@@ -62,8 +63,9 @@ while True:
     # TODO send data back on what robot needs to do
     client_socket.sendall(b"test")
     print("sending data for car")
-
-    #cv2.imshow('img from nicla', img)
+    img = cv2.rotate(img, cv2.ROTATE_180)
+    
+ 
     #img = roadDetection.readImage('C:\\VisionProject\\Pictures\\HVGA\\Weg\\00044.jpg',cv2.ROTATE_180)
 
     #gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # temp
@@ -79,13 +81,18 @@ while True:
     #cv2.imshow('edges', edges)
 
     usableHeight = 185
-    imageWidth = 420
+    imageWidth = 480
 
-    correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight)
-    correction = 0
+    img = roadDetection.__cropImage(img,usableHeight,0,0,0)
+    correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight,imgVisual=img)
     #only for visualizing
-    edges = roadDetection.__cropImage(edges,usableHeight,0,0,0)
+    #edges = roadDetection.__cropImage(edges,usableHeight,0,0,0)
     #cv2.imshow('Edges', edges)
+    # end only for visualizing 
+
+    #only for visualizing
+
+    #cv2.imshow('img from nicla', img)
     # end only for visualizing 
 
     print(correction)
@@ -93,16 +100,16 @@ while True:
         print("no line/not enough lines detected")
     elif(correction == -999):
         print("error")
-    elif(correction < -20):
+    elif(correction < -100):
         print("right")
-    elif(correction > 20):
+    elif(correction > 25):
         print("left")
     else:
         print("straight")
 
     #if(correction != -999):
-    print(roadDetection.checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth))
+    print(roadDetection.checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth,imgVisual=img))
 
-    #cv2.waitKey(100)
+    cv2.waitKey(100)
 
     #cv2.destroyAllWindows()

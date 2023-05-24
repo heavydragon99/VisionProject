@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import sys
 
-def __drawLines(lines):
+def __drawLines(lines,img):
     #visualize
     if(lines is not None):
         for line in lines:
@@ -17,8 +17,8 @@ def __drawLines(lines):
             y1 = int(y0 + 1000*(a))
             x2 = int(x0 - 1000*(-b))
             y2 = int(y0 - 1000*(a))
-            cv2.line(gray_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-        cv2.imshow('Image from Socket', gray_img)
+            cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.imshow('Image from Socket', img)
     # end visualize 
 
 def readImage(imgpath,rotateValue):
@@ -64,7 +64,7 @@ def __checkRoadForLines(edges,rhoVar,thetaVar,minTheta,maxTheta,thresholdVar,rho
 
     return lines
 
-def checkSides(middleOfScreen,edges,usableImageHeight):
+def checkSides(middleOfScreen,edges,usableImageHeight,imgVisual):
     #uses 2 times hough
 
     #rho 1
@@ -85,13 +85,10 @@ def checkSides(middleOfScreen,edges,usableImageHeight):
         allLines = linesRight
     else:
         return -999
-    
-    print(str(linesLeft))
-    print("--")
-    print(str(linesRight))
+
 
     # visualize
-    #__drawLines(allLines);
+    #__drawLines(allLines,imgVisual);
     # end visualize
 
     #initialize variable
@@ -129,17 +126,20 @@ def checkSides(middleOfScreen,edges,usableImageHeight):
     elif(len(lineXValues) == 3):
         print("3 lines")
         # 2l - 1r
-        if(len(linesLeft) == 2):
+        if(linesLeft is not None and len(linesLeft) == 2):
+            print("left lines")
             left = (lineXValues[0] + lineXValues[1]) /2
             middle = (left + lineXValues[2]) / 2
             correction = middleOfScreen - middle
+            print("coor:" + str(correction))
             return correction
         # 1l - 2r
         else:
-                right = (lineXValues[1] + lineXValues[2]) /2
-                middle = (right + lineXValues[0]) / 2
-                correction = middleOfScreen - middle
-                return correction
+            print("right lines")
+            right = (lineXValues[1] + lineXValues[2]) /2
+            middle = (right + lineXValues[0]) / 2
+            correction = middleOfScreen - middle
+            return correction
     # more then 4 lines
     elif(len(lineXValues) == 2 and linesLeft is not None and linesRight is not None):
         print("2 lines 1l 1r")
@@ -154,9 +154,9 @@ def checkSides(middleOfScreen,edges,usableImageHeight):
         print("not enough lines")
         return -999
     
-def checkIntersections(edges,usableImageHeight,imageWidth):
+def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
     #uses 6 thimes Hough
-    edges = __cropImage(edges,usableImageHeight,60,0,0)
+    edges = __cropImage(edges,usableImageHeight,0,0,0)
     # get lines to check if there is an intersection 
     lines = __checkRoadForLines(edges,rhoVar=1,thetaVar =(np.pi/180)*1,minTheta =(np.pi/180)*70,maxTheta =(np.pi/180)*110,thresholdVar=80,rhoOffset = 5,thetaOffset = 0.04)
    
@@ -165,12 +165,11 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
         return "no intersection"
     
     if(len(lines) < 2):
-        #temp
-        #__drawLines(lines)
+
         return "no intersection"
-    
+    print(lines)
     # visualize
-    #__drawLines(lines)
+    #__drawLines(lines,imgVisual);
     # end visualize    
     
     fourwayIntersection = True
@@ -184,7 +183,7 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
     linesLeft = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=55,rhoOffset = 21,thetaOffset = 0.5)
 
     # visualize
-    #__drawLines(linesLeft)
+    #__drawLines(linesLeft,imgVisual);
     # end visualize 
 
     #determine higest x value
@@ -230,21 +229,30 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
 
 
     # visualize
-    #__drawLines(IntersectionLeft)
+    #__drawLines(IntersectionLeft,imgVisual);
     # end visualize 
    
     upImage = __cropImage(edges,0,0,100-yHigh,0)
-    #cv2.imshow("test",upImage)
-    IntersectionUpLeft = __checkRoadForLines(upImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.5,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=20,rhoOffset = 7.5,thetaOffset = 0.03)
-    IntersectionUpRight = __checkRoadForLines(upImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.5,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*190,thresholdVar=20,rhoOffset = 7.5,thetaOffset = 0.03)
+    cv2.imshow("test",upImage)
+
+    subWidth = imageWidth/2
+
+    upImageLeft = __cropImage(upImage,0,0,0,subWidth)
+    upImageRight = __cropImage(upImage,0,subWidth,0,0)
+
+    #cv2.imshow("left up",upImageLeft)
+    #cv2.imshow("right up",upImageRight)
+
+    IntersectionUpLeft = __checkRoadForLines(upImageLeft,rhoVar=0.5,thetaVar =(np.pi/180)*0.5,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=20,rhoOffset = 7.5,thetaOffset = 0.03)
+    IntersectionUpRight = __checkRoadForLines(upImageRight,rhoVar=0.5,thetaVar =(np.pi/180)*0.5,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*190,thresholdVar=20,rhoOffset = 7.5,thetaOffset = 0.03)
     if(IntersectionUpLeft is None or IntersectionUpRight is None):
         fourwayIntersection = False
         leftTIntersection = False
         rightTIntersection = False
     
     # visualize
-    #__drawLines(IntersectionUpLeft)
-    #__drawLines(IntersectionUpRight)
+    #__drawLines(IntersectionUpLeft,imgVisual);
+    #__drawLines(IntersectionUpRight,imgVisual);
     # end visualize 
 
 
@@ -253,7 +261,7 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
     linesRight = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*2,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*180,thresholdVar=60,rhoOffset = 10,thetaOffset = 0.07)
     
     # visualize
-    #__drawLines(linesRight)
+    #__drawLines(linesRight,imgVisual);
     # end visualize 
     
     if(linesRight is not None):
@@ -273,7 +281,7 @@ def checkIntersections(edges,usableImageHeight,imageWidth):
         IntersectionRight = __checkRoadForLines(rightImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.1,minTheta =(np.pi/180)*70,maxTheta =(np.pi/180)*110,thresholdVar=25,rhoOffset = 7.5,thetaOffset = 0.07)
         #print(str(IntersectionRight))
         # visualize
-        #__drawLines(IntersectionRight)
+        #__drawLines(IntersectionRight,imgVisual);
         # end visualize 
         
         if(IntersectionRight is None or len(IntersectionRight) < 2):
