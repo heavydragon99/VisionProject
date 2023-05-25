@@ -11,6 +11,9 @@ int inputValue;
 int motorValue; //msb t/m 4 is voor motor, 3 t/m lsb is voor borden
 int bits[8] = {0,0,0,0,0,0,0,0};
 
+int countLoops = 0;
+int ReceivedValue = 0;
+
 int checkSilence()  //Check wheter no messages are currently being received
 {
   int canstart=0;
@@ -48,25 +51,30 @@ void requestData()
   digitalWrite(led,HIGH);
 }
 
-void waitForStart()
+bool waitForStart()
 {
+  int timeout = 0;
   while (digitalRead(fromNicla) == 1) {
-  //while (1){
-    //Serial.println(digitalRead(fromNicla));
+    if(timeout == 10000)
+    {
+      Serial.println("timeout");
+      return false;
+    }
     ledRed(digitalRead(fromNicla));
+    timeout++;
   }
-  //Serial.println("Startbit");
+  return true;
 }
 
 int receiveByte()
 {
   digitalWrite(toNicla,LOW); //NOT READY TO RECEIVE
   digitalWrite(led,LOW);
-  delay(25); //Go to halfway through the startbit
+  delay(5); //Go to halfway through the startbit
   motorValue = 0;
   for (int i = 0; i < 8; i++)
   {
-    delay(50);
+    delay(10);
     int inputValue = digitalRead(fromNicla);
     //Serial.print(inputValue);
     motorValue |= ((1&inputValue) << i);
@@ -113,21 +121,46 @@ void setup() {
   digitalWrite(toNicla,LOW);
   digitalWrite(led,HIGH);
   motorValue = 0;
+  delay(1000);
 }
 
 /////////////TO DO: ZORGEN DAT ER EEN TWEEDE LIJN KOMT DIE DATA REQUEST
 void loop() {
+  
 //  while(checkSilence())
 //  {
 //  }
-  ////delay(5000);
+  //delay(5000);
   //Serial.println("request now");
   requestData();
-  waitForStart();
-  receiveByte();
-  //Serial.println();
-  Serial.println(motorValue);
-  processCommand(motorValue / 16);
-  delay(50);
+  bool checkStart = waitForStart();
+
+  if(checkStart)
+  {
+    Serial.println("receive");
+    receiveByte();
+    if(motorValue != 255)
+    {
+      ReceivedValue = motorValue;
+    }
+    countLoops = 0;
+  }
   
+  //Serial.println();
+
+  Serial.println("countLoops-");
+  Serial.println(countLoops);
+  if(countLoops < 10)
+  {
+      Serial.println("motorValue-");
+      Serial.println(ReceivedValue);
+    processCommand(motorValue);
+  }
+  else
+  {
+    processCommand(0); 
+  }
+   
+  //delay(50);
+  countLoops++;
 }
