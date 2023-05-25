@@ -84,9 +84,8 @@ while True:
     correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight,imgVisual=img)
     intersection = roadDetection.checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth,imgVisual=img)
     
-    if(intersection != "no intersection"):
-        print(intersection)
-        user_input = input("Enter something: ")
+       
+        
     #only for visualizing
     #edges = roadDetection.__cropImage(edges,usableHeight,0,0,0)
     #cv2.imshow('Edges', edges)
@@ -99,7 +98,9 @@ while True:
 
     print(correction)
     if(intersection != "no intersection"):
-        client_socket.sendall(b"left")
+        print(intersection)
+        user_input = input("Enter direction: ")
+        client_socket.sendall(b""+user_input+"")
     elif(correction == None):
         print("no line/not enough lines detected")
         client_socket.sendall(b"0")

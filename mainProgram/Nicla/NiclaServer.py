@@ -130,6 +130,36 @@ def sendImageRecieveCommand():
                         pyb.delay(100)
                         while(1):
                             continue
+                    if(response == b"right"):
+                        uartSendData(1)
+                        pyb.delay(100)
+                        uartSendData(1)
+                        pyb.delay(100)
+                        uartSendData(1)
+                        pyb.delay(100)
+                        uartSendData(1)
+                        pyb.delay(100)
+                        uartSendData(5)
+                        pyb.delay(100)
+                        uartSendData(5)
+                        pyb.delay(100)
+                        uartSendData(0)
+                        pyb.delay(100)
+                        while(1):
+                            continue
+                    if(response == b"up"):
+                        uartSendData(1)
+                        pyb.delay(100)
+                        uartSendData(1)
+                        pyb.delay(100)
+                        uartSendData(1)
+                        pyb.delay(100)
+                        uartSendData(1)
+                        pyb.delay(100)
+                        uartSendData(0)
+                        pyb.delay(100)
+                        while(1):
+                            continue
                     else:
                         uartSendData(int(response))
                 else:

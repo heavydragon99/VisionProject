@@ -155,6 +155,7 @@ def checkSides(middleOfScreen,edges,usableImageHeight,imgVisual):
         return -999
     
 def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
+    lengthToIntersection = 0;
     #uses 6 thimes Hough
     edges = __cropImage(edges,usableImageHeight,0,0,0)
     # get lines to check if there is an intersection 
@@ -162,11 +163,11 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
    
     #return when no intersectio or corner in detected
     if(lines is None):
-        return "no intersection"
+        return "no intersection",0
     
     if(len(lines) < 2):
 
-        return "no intersection"
+        return "no intersection",0
     print(lines)
     # visualize
     #__drawLines(lines,imgVisual);
@@ -178,6 +179,16 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
     downTIntersection = True
     rightCorner = True
     leftCorner = True
+
+    #calculate length to intersection
+
+    for line in lines:
+        rho, theta = line[0]
+        b = np.sin(theta)
+        y0 = b * rho
+        lengthToIntersection = y0
+
+
 
     #check left side for verical lines to determine the X value
     linesLeft = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=55,rhoOffset = 21,thetaOffset = 0.5)
@@ -296,19 +307,19 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
         rightCorner = False
     
     if(fourwayIntersection == True):
-        return "fourwayIntersection"
+        return "fourwayIntersection",lengthToIntersection
     elif(leftTIntersection == True):
-        return "leftTIntersection"
+        return "leftTIntersection",lengthToIntersection
     elif(rightTIntersection == True):
-        return "rightTIntersection"
+        return "rightTIntersection",lengthToIntersection
     elif(downTIntersection == True):
-        return "downTIntersection"
+        return "downTIntersection",lengthToIntersection
     elif(rightCorner == True):
-        return "rightCorner"
+        return "rightCorner",lengthToIntersection
     elif(leftCorner == True):
-        return "leftCorner"
+        return "leftCorner",lengthToIntersection
     else:
-        return "Error could not indentify intersection/corner"
+        return "Error could not indentify intersection/corner",0
 
 
 

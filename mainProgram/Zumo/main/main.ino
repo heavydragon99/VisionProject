@@ -97,17 +97,21 @@ void processCommand(unsigned commandValue)
       //vooruit
       break;
     case 2:
-      motors.setLeftSpeed(50);
-      motors.setRightSpeed(75);
+      motors.setLeftSpeed(75);
+      motors.setRightSpeed(100);
       //links
       break;
     case 3:
-      motors.setLeftSpeed(75);
-      motors.setRightSpeed(50);
+      motors.setLeftSpeed(100);
+      motors.setRightSpeed(75);
       break;
     case 4:
-      motors.setLeftSpeed(0);
+      motors.setLeftSpeed(-150);
       motors.setRightSpeed(150);
+      break;
+    case 5:
+      motors.setLeftSpeed(150);
+      motors.setRightSpeed(-150);
       break;
     default:
       break;
