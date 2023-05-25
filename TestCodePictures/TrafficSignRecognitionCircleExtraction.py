@@ -122,7 +122,7 @@
 import cv2
 import numpy as np
 
-img = cv2.imread("D:\\Github\\VisionProject\\Pictures\\VerbodenAutos\\00280.jpg")   #read image
+img = cv2.imread("C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\StoplichtGroen\\00016.jpg")   #read image
 #img = cv2.imread("D:\\Github\\VisionProject\\Pictures\\VerbodenInhalen\\00430.jpg")   #read image
 #img = cv2.imread("D:\\Github\\VisionProject\\Pictures\\VerbodenInTeRijden\\00186.jpg")   #read image
 #img = cv2.imread("D:\\Github\\VisionProject\\Pictures\\50\\00325.jpg")   #read image
