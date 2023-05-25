@@ -7,7 +7,7 @@ import socket
 
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.104'
+IP_ADDRESS = '192.168.137.80'
 PORT = 8080
 
 # Create socket object
@@ -60,9 +60,6 @@ while True:
     # Decode image data to OpenCV Mat object
     img = cv2.imdecode(img_arr, cv2.IMREAD_GRAYSCALE)
 
-    # TODO send data back on what robot needs to do
-    client_socket.sendall(b"test")
-    print("sending data for car")
     img = cv2.rotate(img, cv2.ROTATE_180)
     
  
@@ -85,6 +82,11 @@ while True:
 
     img = roadDetection.__cropImage(img,usableHeight,0,0,0)
     correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight,imgVisual=img)
+    intersection = roadDetection.checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth,imgVisual=img)
+    
+    if(intersection != "no intersection"):
+        print(intersection)
+        user_input = input("Enter something: ")
     #only for visualizing
     #edges = roadDetection.__cropImage(edges,usableHeight,0,0,0)
     #cv2.imshow('Edges', edges)
@@ -96,20 +98,32 @@ while True:
     # end only for visualizing 
 
     print(correction)
-    if(correction == None):
+    if(intersection != "no intersection"):
+        client_socket.sendall(b"left")
+    elif(correction == None):
         print("no line/not enough lines detected")
+        client_socket.sendall(b"0")
+        print("sending data for car")
     elif(correction == -999):
         print("error")
+        client_socket.sendall(b"0")
+        print("sending data for car")
     elif(correction < -100):
         print("right")
+        client_socket.sendall(b"3")
+        print("sending data for car")
     elif(correction > 25):
         print("left")
+        client_socket.sendall(b"2")
+        print("sending data for car")
     else:
         print("straight")
+        client_socket.sendall(b"1")
+        print("sending data for car")
+    
 
     #if(correction != -999):
-    print(roadDetection.checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth,imgVisual=img))
-
-    cv2.waitKey(100)
+    
+    #cv2.waitKey(100)
 
     #cv2.destroyAllWindows()

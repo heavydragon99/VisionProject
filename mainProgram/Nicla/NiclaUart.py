@@ -57,5 +57,5 @@ def uartSendData(data):
 
 while(1):
     pyb.delay(100);
-    uartSendData(0);
+    uartSendData(3);
 

@@ -233,7 +233,7 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
     # end visualize 
    
     upImage = __cropImage(edges,0,0,100-yHigh,0)
-    cv2.imshow("test",upImage)
+    #lefcv2.imshow("test",upImage)
 
     subWidth = imageWidth/2
 
