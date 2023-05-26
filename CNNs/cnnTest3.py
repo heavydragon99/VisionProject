@@ -1,3 +1,5 @@
+#Gestolen van https://www.analyticsvidhya.com/blog/2021/12/traffic-signs-recognition-using-cnn-and-keras-in-python/
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
