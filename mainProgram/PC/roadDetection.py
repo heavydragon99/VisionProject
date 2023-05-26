@@ -155,7 +155,7 @@ def checkSides(middleOfScreen,edges,usableImageHeight,imgVisual):
         return -999
     
 def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
-    lengthToIntersection = 0;
+    lengthToIntersection = 0
     #uses 6 thimes Hough
     edges = __cropImage(edges,usableImageHeight,0,0,0)
     # get lines to check if there is an intersection 
@@ -168,7 +168,7 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
     if(len(lines) < 2):
 
         return "no intersection",0
-    print(lines)
+    #print(lines)
     # visualize
     #__drawLines(lines,imgVisual);
     # end visualize    
@@ -181,20 +181,23 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
     leftCorner = True
 
     #calculate length to intersection
-
+    amount = 0
     for line in lines:
         rho, theta = line[0]
         b = np.sin(theta)
         y0 = b * rho
-        lengthToIntersection = y0
+        print("y0" + str(y0))
+        lengthToIntersection = lengthToIntersection + y0
+        amount += 1
 
-
+    lengthToIntersection = (lengthToIntersection/amount)
 
     #check left side for verical lines to determine the X value
-    linesLeft = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*3,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=55,rhoOffset = 21,thetaOffset = 0.5)
-
+    #thetaVar was 3
+    linesLeft = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*1,minTheta =(np.pi/180)*-10,maxTheta =(np.pi/180)*80,thresholdVar=55,rhoOffset = 21,thetaOffset = 0.5)
+    
     # visualize
-    #__drawLines(linesLeft,imgVisual);
+    #__drawLines(linesLeft,imgVisual)
     # end visualize 
 
     #determine higest x value
@@ -212,8 +215,11 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
         #print("xHigh: "+ str(xHigh))
         #crop image to be able to check left side of screen
         leftImage = __cropImage(edges,0,0,0,imageWidth-xHigh)
+        #cv2.imshow("leftImage",leftImage)
 
         IntersectionLeft = __checkRoadForLines(leftImage,rhoVar=0.5,thetaVar =(np.pi/180)*0.1,minTheta =(np.pi/180)*70,maxTheta =(np.pi/180)*110,thresholdVar=25,rhoOffset = 7.5,thetaOffset = 0.03)
+        #__drawLines(IntersectionLeft,leftImage)
+        
         if(IntersectionLeft is None or len(IntersectionLeft) < 2):
             fourwayIntersection = False
             leftTIntersection = False
@@ -235,15 +241,15 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
         x0 = a * rho
         y0 = b * rho
         if(yHigh > y0):
-            yHigh = (y0-5)
+            yHigh = (y0)
             #TODO -5 test offset
 
 
     # visualize
     #__drawLines(IntersectionLeft,imgVisual);
     # end visualize 
-   
-    upImage = __cropImage(edges,0,0,100-yHigh,0)
+    height, width = edges.shape[:2]
+    upImage = __cropImage(edges,0,0,height-yHigh,0)
     #lefcv2.imshow("test",upImage)
 
     subWidth = imageWidth/2
@@ -269,8 +275,8 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
 
     #check right side
     #TODO: test if needed
-    linesRight = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*2,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*180,thresholdVar=60,rhoOffset = 10,thetaOffset = 0.07)
-    
+    #old linesRight = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*2,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*180,thresholdVar=60,rhoOffset = 10,thetaOffset = 0.07)
+    linesRight = __checkRoadForLines(edges,rhoVar=0.9,thetaVar =(np.pi/180)*1,minTheta =(np.pi/180)*100,maxTheta =(np.pi/180)*190,thresholdVar=55,rhoOffset = 21,thetaOffset = 0.5)
     # visualize
     #__drawLines(linesRight,imgVisual);
     # end visualize 

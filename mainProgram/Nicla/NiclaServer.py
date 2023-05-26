@@ -18,6 +18,9 @@ toZumo.value(0)
 uartDelayBegin = 20     # Delay before sending Uart
 uartDelay = 10          # Delay between uart bits (plural of 2)
 
+#led variable
+ledBlue = Pin("LED_BLUE", Pin.OUT)
+
 #Uart function no return value
 def uartSendData(data):
 
@@ -57,6 +60,8 @@ def uartSendData(data):
 
 #wifi function no return value
 def sendImageRecieveCommand():
+    ledBlue.off()
+
     # Init sensor
     sensor.reset()
     sensor.set_framesize(sensor.HVGA)
@@ -83,6 +88,7 @@ def sendImageRecieveCommand():
     print("block")
     # Set server socket to blocking
     s.setblocking(True)
+    ledBlue.on()
     clock = time.clock()
     while True:
         # Accept a client socket
@@ -110,56 +116,57 @@ def sendImageRecieveCommand():
                     # Send image data to client
                     clientsock.sendall(img_buf)
                     response = clientsock.recv(16)
-                    print("response" + str(response))
-
+                    strresponse = str(response)
+                    direction = ""
+                    amount = 0
+                    print("response" + strresponse)
+                    if "|" in strresponse:
+                        substrings = strresponse.split("|")
+                        direction = str(substrings[0].replace("b'", ""))
+                        length = substrings[1].replace("'", "")
+                        float_value = float(str(length))
+                        rounded_value = round(float_value)
+                        int_value = int(rounded_value)
+                        print(direction)
+                        print(int_value)
+                        amount = (int_value/9)
+                    else:
+                        direction = str(response)
                     #todo intersection handeling
-                    if(response == b"left"):
-                        uartSendData(1)
-                        pyb.delay(100)
-                        uartSendData(1)
-                        pyb.delay(100)
-                        uartSendData(1)
-                        pyb.delay(100)
-                        uartSendData(1)
-                        pyb.delay(100)
+                    if(direction == "left"):
+                        print("amount:" + str(amount))
+                        for i in range(0, amount):
+                            uartSendData(1)
+                            pyb.delay(130)
+                        uartSendData(4)
+                        pyb.delay(130)
                         uartSendData(4)
                         pyb.delay(100)
                         uartSendData(4)
                         pyb.delay(100)
                         uartSendData(0)
-                        pyb.delay(100)
-                        while(1):
-                            continue
-                    if(response == b"right"):
-                        uartSendData(1)
-                        pyb.delay(100)
-                        uartSendData(1)
-                        pyb.delay(100)
-                        uartSendData(1)
-                        pyb.delay(100)
-                        uartSendData(1)
-                        pyb.delay(100)
+                        print("end left")
+                    elif(direction == "right"):
+                        print("amount:" + str(amount))
+                        for i in range(0, amount):
+                            uartSendData(1)
+                            pyb.delay(130)
+                        uartSendData(5)
+                        pyb.delay(130)
                         uartSendData(5)
                         pyb.delay(100)
                         uartSendData(5)
                         pyb.delay(100)
                         uartSendData(0)
-                        pyb.delay(100)
-                        while(1):
-                            continue
-                    if(response == b"up"):
-                        uartSendData(1)
-                        pyb.delay(100)
-                        uartSendData(1)
-                        pyb.delay(100)
-                        uartSendData(1)
-                        pyb.delay(100)
-                        uartSendData(1)
-                        pyb.delay(100)
+                        print("end right")
+                    elif(direction == "up"):
+                        print("amount:" + str(amount))
+                        for i in range(0, (amount+2)):
+                            uartSendData(1)
+                            pyb.delay(130)
                         uartSendData(0)
-                        pyb.delay(100)
-                        while(1):
-                            continue
+                        print("end up")
+
                     else:
                         uartSendData(int(response))
                 else:
