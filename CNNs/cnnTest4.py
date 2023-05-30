@@ -14,12 +14,12 @@ from keras.layers import Conv2D, MaxPool2D, Dense, Flatten, Dropout
 
 data = []
 labels = []
-classes = 7
+classes = 3
 cur_path = os.getcwd()
 
 # Retrieving the images and their labels
 for i in range(classes):
-    path = os.path.join(cur_path, 'HVGA_reduced', str(i))
+    path = os.path.join(cur_path, 'train', str(i))
     images = os.listdir(path)
     for a in images:
         try:
@@ -63,7 +63,7 @@ model.add(Dense(43, activation='softmax'))
 # Compilation of the model
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-eps = 100
+eps = 50
 anc = model.fit(X_t1, y_t1, batch_size=32, epochs=eps, validation_data=(X_t2, y_t2))
 
 model.save("my_model_custom.h5")

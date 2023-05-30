@@ -1,12 +1,3 @@
-#Fout: 
-#Verboden voor auto's (wordt einde voorangsweg)
-#Verboden in te gaan (wordt meerdere)
-#Stoplichten++
-#Voorangsweg
-#Vijftig
-#Doodlopen
-#Eenrichtingspijl
-
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import *
@@ -18,30 +9,18 @@ from keras.models import load_model
 model = load_model('traffic_classifier_custom.h5')
 
 # Dictionary to label all traffic signs class.
-# classes = {1: 'Leeg (0)',
-#            2: 'Vijftig (1)',
-#            3: 'Doodlopende weg(2)',
-#            4: 'Eenrichtingspijl (3)',
-#            5: 'Einde voorangsweg(4)',
-#            6: 'Haaientanden(5)',
-#            7: 'Verboden voor auto\'s(6)',s
-#            8: 'Verboden in te halen(7)',
-#            9: 'Verboden in te gaan(8)',
-#            10: 'Parkeerverbod(9)',
-#            11: 'Verboden te stoppen (10)',
-#            12: 'Stop! (11)',
-#            13: 'Stoplicht oranje(12)',
-#            14: 'Stoplicht groen(13)',
-#            15: 'Stoplicht rood(14)',
-#            16: 'Voorangsweg (15)'}
-
-classes = {1: 'Stoplicht rood (0)',
-           2: 'Stoplicht oranje (1)',
-           3: 'Stoplicht groen (2)',
-           4: 'Voorangsweg (3)',
-           5: 'Vijftig (4)',
-           6: 'Doodlopende weg (5)',
-           7: 'Eenrichtingspijl (5)'}
+classes = {1: '50 (0)',
+           2: 'Verboden auto (1)',
+           3: 'stop (2)',
+           4: 'debug4',
+           5: 'debug5',
+           6: 'debug6',
+           7: 'debug7',
+           8: 'debug8',
+           9: 'debug9',
+           10: 'debug10',
+           11: 'debug11'
+           }
 
 
 # Initialise GUI
@@ -64,6 +43,8 @@ def classify(file_path):
     image = np.array(image)
     pred_probs = model.predict(image)  # Get predicted probabilities for each class
     pred = np.argmax(pred_probs)  # Get the class label with highest probability using np.argmax
+
+    print(pred)
     sign = classes[pred + 1]
     print(sign)
     label.configure(foreground='#011638', text=sign)
