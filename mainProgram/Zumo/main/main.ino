@@ -7,6 +7,7 @@ const int receivePin = 7;
 const int sendPin = 4;
 const int led = LED_BUILTIN;
 Zumo32U4Motors motors;
+Zumo32U4Encoders encoders;
 int inputValue;
 int motorValue; //msb t/m 4 is voor motor, 3 t/m lsb is voor borden
 int bits[8] = {0,0,0,0,0,0,0,0};
@@ -45,6 +46,38 @@ int checkSilence()  //Check wheter no messages are currently being received
   return 1;
 }
 
+void turn(long degree) {
+  encoders.getCountsAndResetLeft();
+  encoders.getCountsAndResetRight();
+
+  long countsLeft = 0;
+  long countsRight = 0;
+  long degreeToCount = 7;
+  if(degree > 0)//turn right
+  {
+    int count = degree*degreeToCount;
+
+    motors.setSpeeds(125, -125);
+    while(countsLeft < count and countsRight < count) {
+    countsLeft += encoders.getCountsAndResetLeft();
+    countsRight += encoders.getCountsAndResetRight();
+    delay(2);
+  }
+  }
+  if(degree < 0)//turn left
+  {
+    int count = (degree*-1)*degreeToCount;
+    motors.setSpeeds(-125, 125);
+    while(countsLeft < count and countsRight < count) {
+    countsLeft += encoders.getCountsAndResetLeft();
+    countsRight += encoders.getCountsAndResetRight();
+    delay(2);
+  }
+  
+  }
+  motors.setSpeeds(0, 0);
+}
+
 void requestData()
 {
   digitalWrite(toNicla,HIGH); //ready to receive
@@ -70,11 +103,11 @@ int receiveByte()
 {
   digitalWrite(toNicla,LOW); //NOT READY TO RECEIVE
   digitalWrite(led,LOW);
-  delay(5); //Go to halfway through the startbit
+  delay(1); //Go to halfway through the startbit
   motorValue = 0;
   for (int i = 0; i < 8; i++)
   {
-    delay(10);
+    delay(2);
     int inputValue = digitalRead(fromNicla);
     //Serial.print(inputValue);
     motorValue |= ((1&inputValue) << i);
@@ -106,12 +139,10 @@ void processCommand(unsigned commandValue)
       motors.setRightSpeed(75);
       break;
     case 4:
-      motors.setLeftSpeed(-150);
-      motors.setRightSpeed(150);
+      turn(-90);
       break;
     case 5:
-      motors.setLeftSpeed(150);
-      motors.setRightSpeed(-150);
+      turn(90);
       break;
     default:
       break;
