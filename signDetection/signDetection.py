@@ -20,13 +20,6 @@ SIGNS = ["ERROR",
         "SPEED LIMIT",
         "fout"]
 
-# Clean all previous file
-# def clean_images():
-# 	file_list = os.listdir('./')
-# 	for file_name in file_list:
-# 		if '.png' in file_name:
-# 			os.remove(file_name)
-
 
 ### Preprocess image
 def constrastLimit(image):
@@ -52,8 +45,8 @@ def LaplacianOfGaussian(image):
     return LoG_image
     
 def binarization(image):
-    thresh = cv2.threshold(image,32,255,cv2.THRESH_BINARY)[1]
-    #thresh = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,2)
+    thresh = cv2.threshold(image,35,255,cv2.THRESH_BINARY)[1]
+    #thresh = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
     return thresh
 
 def preprocess_image(image):
@@ -139,7 +132,7 @@ def findLargestSign(image, contours, threshold, distance_theshold):
             right, bottom = np.amax(coordinate, axis = 0)
             coordinate = [(left-2,top-2),(right+3,bottom+1)]
             sign = cropSign(image,coordinate)
-    return sign, coordinate
+    return sign
 
 
 def findSigns(image, contours, threshold, distance_theshold):
@@ -170,35 +163,13 @@ def localization(image, min_size_components, similitary_contour_with_circle, mod
 
     binary_image = cv2.bitwise_and(binary_image,binary_image, mask=remove_other_color(image))
 
-    #binary_image = remove_line(binary_image)
+    cv2.imshow('Binary',binary_image)
 
-    #cv2.imshow('BINARY IMAGE', binary_image)
     contours = findContour(binary_image)
     #signs, coordinates = findSigns(image, contours, similitary_contour_with_circle, 15)
-    sign, coordinate = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
-    
-    text = ""
-    sign_type = -1
-    i = 0
+    sign = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
 
-    #if sign is not None:
-        #sign_type = getLabel(model, sign)
-        #sign_type = sign_type if sign_type <= 8 else 8
-        #text = SIGNS[sign_type]
-        #cv2.imshow('Cropped',sign)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()
-        #cv2.imwrite(str(count)+'_'+text+'.png', sign)
-
-    # if sign_type > 0 and sign_type != current_sign_type:        
-    #     cv2.rectangle(original_image, coordinate[0],coordinate[1], (0, 255, 0), 1)
-    #     print("Breedte: ")
-    #     print(coordinate[0])
-    #     print("Hoogte: ")
-    #     print(coordinate[1])
-    #     font = cv2.FONT_HERSHEY_PLAIN
-    #    cv2.putText(original_image,text,(coordinate[0][0], coordinate[0][1] -15), font, 1,(0,0,255),2,cv2.LINE_4)
-    return coordinate, original_image, sign_type, text, sign
+    return sign
 
 def remove_line(img):
     gray = img.copy()
@@ -268,110 +239,19 @@ def main(args):
     position = []
     file = open("Output.txt", "w")
     
-
-    #frame = cv2.resize(frame, (640,int(height/(width/640))))
     frame = cv2.resize(sourceImage, (640,480))
 
     print("Frame:{}".format(count))
-    #image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    coordinate, image, sign_type, text, croppedSign = localization(frame, args.min_size_components, args.similitary_contour_with_circle, model, count, current_sign)
-    # if coordinate is not None:
-    #     print("Breedte: ")
-    #     print(coordinate[0])
-    #     print("Hoogte: ")
-    #     print(coordinate[1])
-    #     cv2.rectangle(image, coordinate[0],coordinate[1], (255, 255, 255), 1)
-    # print("Sign:{}".format(sign_type))
-    # if sign_type > 0 and (not current_sign or sign_type != current_sign):
-    #     current_sign = sign_type
-    #     current_text = text
-    #     top = int(coordinate[0][1]*1.05)
-    #     left = int(coordinate[0][0]*1.05)
-    #     bottom = int(coordinate[1][1]*0.95)
-    #     right = int(coordinate[1][0]*0.95)
-
-    #     position = [count, sign_type if sign_type <= 8 else 8, coordinate[0][0], coordinate[0][1], coordinate[1][0], coordinate[1][1]]
-    #     cv2.rectangle(image, coordinate[0],coordinate[1], (0, 255, 0), 1)
-    #     font = cv2.FONT_HERSHEY_PLAIN
-    #     cv2.putText(image,text,(coordinate[0][0], coordinate[0][1] -15), font, 1,(0,0,255),2,cv2.LINE_4)
-
-    #     tl = [left, top]
-    #     br = [right,bottom]
-    #     print(tl, br)
-    #     current_size = math.sqrt(math.pow((tl[0]-br[0]),2) + math.pow((tl[1]-br[1]),2))
-    #     # grab the ROI for the bounding box and convert it
-    #     # to the HSV color space
-    #     roi = frame[tl[1]:br[1], tl[0]:br[0]]
-    #     roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-    #     #roi = cv2.cvtColor(roi, cv2.COLOR_BGR2LAB)
-
-    #     # compute a HSV histogram for the ROI and store the
-    #     # bounding box
-    #     roiHist = cv2.calcHist([roi], [0], None, [16], [0, 180])
-    #     roiHist = cv2.normalize(roiHist, roiHist, 0, 255, cv2.NORM_MINMAX)
-    #     roiBox = (tl[0], tl[1], br[0], br[1])
-
-    # elif current_sign:
-    #     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    #     backProj = cv2.calcBackProject([hsv], [0], roiHist, [0, 180], 1)
-
-    #     # apply cam shift to the back projection, convert the
-    #     # points to a bounding box, and then draw them
-    #     (r, roiBox) = cv2.CamShift(backProj, roiBox, termination)
-    #     pts = np.int0(cv2.boxPoints(r))
-    #     s = pts.sum(axis = 1)
-    #     tl = pts[np.argmin(s)]
-    #     br = pts[np.argmax(s)]
-    #     size = math.sqrt(pow((tl[0]-br[0]),2) +pow((tl[1]-br[1]),2))
-    #     print(size)
-
-    #     if  current_size < 1 or size < 1 or size / current_size > 30 or math.fabs((tl[0]-br[0])/(tl[1]-br[1])) > 2 or math.fabs((tl[0]-br[0])/(tl[1]-br[1])) < 0.5:
-    #         current_sign = None
-    #         print("Stop tracking")
-    #     else:
-    #         current_size = size
-
-    #     if sign_type > 0:
-    #         top = int(coordinate[0][1])
-    #         left = int(coordinate[0][0])
-    #         bottom = int(coordinate[1][1])
-    #         right = int(coordinate[1][0])
-
-    #         print("Breedte: ")
-    #         print(coordinate[0])
-    #         print("Hoogte: ")
-    #         print(coordinate[1])
-
-    #         position = [count, sign_type if sign_type <= 8 else 8, left, top, right, bottom]
-    #         cv2.rectangle(image, coordinate[0],coordinate[1], (0, 255, 0), 1)
-    #         font = cv2.FONT_HERSHEY_PLAIN
-    #         cv2.putText(image,text,(coordinate[0][0], coordinate[0][1] -15), font, 1,(0,0,255),2,cv2.LINE_4)
-    #     elif current_sign:
-    #         position = [count, sign_type if sign_type <= 8 else 8, tl[0], tl[1], br[0], br[1]]
-    #         cv2.rectangle(image, (tl[0], tl[1]),(br[0], br[1]), (0, 255, 0), 1)
-    #         font = cv2.FONT_HERSHEY_PLAIN
-    #         cv2.putText(image,current_text,(tl[0], tl[1] -15), font, 1,(0,0,255),2,cv2.LINE_4)
-
-    #         #print("Breedte: ")
-    #         #print(coordinate[0])
-    #         #print("Hoogte: ")
-    #         #print(coordinate[1])
-
-    # if current_sign:
-    #     sign_count += 1
-    #     coordinates.append(position)
+    croppedSign = localization(frame, args.min_size_components, args.similitary_contour_with_circle, model, count, current_sign)
 
     cv2.imshow('Result', croppedSign)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    #count = count + 1
 
-    #file.write("{}".format(sign_count))
-    #for pos in coordinates:
-    #    file.write("\n{} {} {} {} {} {}".format(pos[0],pos[1],pos[2],pos[3],pos[4], pos[5]))
-    #print("Finish {} frames".format(count))
-    #file.close()
-    #return 
+
+
+
+
 
 
 if __name__ == '__main__':
@@ -380,7 +260,7 @@ if __name__ == '__main__':
     parser.add_argument(
       '--file_name',
       #default= "./MVI_1049.avi",
-      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\50\\00016.jpg",
+      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\STOP\\00023.jpg",
       help= "Video to be analyzed"
       )
     
