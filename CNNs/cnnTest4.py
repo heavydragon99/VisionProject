@@ -14,7 +14,7 @@ from keras.layers import Conv2D, MaxPool2D, Dense, Flatten, Dropout
 
 data = []
 labels = []
-classes = 3
+classes = 7
 cur_path = os.getcwd()
 
 # Retrieving the images and their labels
@@ -105,4 +105,4 @@ plt.show()
 # # Accuracy with the test data
 # print(accuracy_score(labels, pred))
 
-model.save('traffic_classifier_custom.h5')
+model.save('traffic_classifier_7borden.h5')

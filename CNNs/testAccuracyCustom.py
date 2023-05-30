@@ -6,16 +6,16 @@ import numpy as np
 # Load the trained model to classify sign
 from keras.models import load_model
 
-model = load_model('traffic_classifier_custom.h5')
+model = load_model('traffic_classifier_7borden.h5')
 
 # Dictionary to label all traffic signs class.
 classes = {1: '50 (0)',
            2: 'Verboden auto (1)',
            3: 'stop (2)',
-           4: 'debug4',
-           5: 'debug5',
-           6: 'debug6',
-           7: 'debug7',
+           4: 'Verboden in te rijden (3)',
+           5: 'Stoplicht rood (4)',
+           6: 'Stoplicht oranje (5)',
+           7: 'Stoplicht groen (6)',
            8: 'debug8',
            9: 'debug9',
            10: 'debug10',
