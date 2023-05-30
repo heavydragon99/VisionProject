@@ -1,3 +1,11 @@
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import *
+from PIL import ImageTk, Image
+# Load the trained model to classify sign
+from keras.models import load_model
+
+
 import cv2
 import numpy as np
 #import matplotlib.pyplot as plt
@@ -10,15 +18,44 @@ import math
 
 from classification import training, getLabel
 
-SIGNS = ["ERROR",
-        "STOP",
-        "TURN LEFT",
-        "TURN RIGHT",
-        "DO NOT TURN LEFT",
-        "DO NOT TURN RIGHT",
-        "ONE WAY",
-        "SPEED LIMIT",
-        "fout"]
+model = load_model('traffic_classifier_7borden.h5')
+
+# SIGNS = ["ERROR",
+#         "STOP",
+#         "TURN LEFT",
+#         "TURN RIGHT",
+#         "DO NOT TURN LEFT",
+#         "DO NOT TURN RIGHT",
+#         "ONE WAY",
+#         "SPEED LIMIT",
+#         "fout"]
+
+# Dictionary to label all traffic signs class.
+classes = {1: '50 (0)',
+           2: 'Verboden auto (1)',
+           3: 'stop (2)',
+           4: 'Verboden in te rijden (3)',
+           5: 'Stoplicht rood (4)',
+           6: 'Stoplicht oranje (5)',
+           7: 'Stoplicht groen (6)'}
+
+
+def classify(image):
+    global label_packed
+    #mijn code
+    #image = image.rotate(180)
+    #einde mijn code
+    #image = image.resize((30, 30))
+    image = cv2.cvtColor(image,cv2.COLOR_GRAY2RGB)
+    image = cv2.resize(image,(30,30))
+    image = np.expand_dims(image, axis=0)
+    image = np.array(image)
+    pred_probs = model.predict(image)  # Get predicted probabilities for each class
+    pred = np.argmax(pred_probs)  # Get the class label with highest probability using np.argmax
+
+    #print(pred)
+    sign = classes[pred + 1]
+    print(sign)
 
 
 ### Preprocess image
@@ -59,7 +96,7 @@ def binarization(image):
 def preprocess_image(image):
     cv2.imshow("precontrast",image)
     image = contrastLimitCustom(image)
-    cv2.imshow('postcontrast',image)
+    #cv2.imshow('postcontrast',image)
     image = LaplacianOfGaussian(image)
     image = binarization(image)
     return image
@@ -109,7 +146,7 @@ def cropContour(image, center, max_distance):
     bottom = min([int(center[0] + max_distance + 1), height-1])
     left = max([int(center[1] - max_distance), 0])
     right = min([int(center[1] + max_distance+1), width-1])
-    print(left, right, top, bottom)
+    #(left, right, top, bottom)
     return image[left:right, top:bottom]
 
 def cropSign(image, coordinate):
@@ -175,7 +212,7 @@ def localization(image, min_size_components, similitary_contour_with_circle, mod
     cv2.imshow('Binary',binary_image)
 
     contours = findContour(binary_image)
-    print(contours)
+    #print(contours)
     #signs, coordinates = findSigns(image, contours, similitary_contour_with_circle, 15)
     sign = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
 
@@ -251,10 +288,11 @@ def main(args):
     
     frame = cv2.resize(sourceImage, (640,480))
 
-    print("Frame:{}".format(count))
+    #print("Frame:{}".format(count))
     croppedSign = localization(frame, args.min_size_components, args.similitary_contour_with_circle, model, count, current_sign)
 
     cv2.imshow('Result', croppedSign)
+    classify(croppedSign)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
@@ -270,7 +308,7 @@ if __name__ == '__main__':
     parser.add_argument(
       '--file_name',
       #default= "./MVI_1049.avi",
-      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\NietInrijden\\00016.jpg",
+      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\StoplichtGroen\\00022.jpg",
       help= "Video to be analyzed"
       )
     
