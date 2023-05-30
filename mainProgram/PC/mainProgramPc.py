@@ -11,7 +11,7 @@ intersectionFound = False
 
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.230'
+IP_ADDRESS = '192.168.137.12'
 PORT = 8080
 
 # Create socket object
@@ -174,11 +174,11 @@ while True:
             print("error")
             client_socket.sendall(b"0")
             print("sending data for car")
-        elif(correction < -100):
+        elif(correction < -60):
             print("right")
             client_socket.sendall(b"3")
             print("sending data for car")
-        elif(correction > 25):
+        elif(correction > 5):
             print("left")
             client_socket.sendall(b"2")
             print("sending data for car")

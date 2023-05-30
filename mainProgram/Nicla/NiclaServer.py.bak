@@ -129,7 +129,7 @@ def sendImageRecieveCommand():
                         int_value = int(rounded_value)
                         print(direction)
                         print(int_value)
-                        amount = (int_value/8)+1
+                        amount = (int_value/8)
                     else:
                         direction = str(response)
                     #todo intersection handeling
