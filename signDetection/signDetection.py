@@ -37,20 +37,29 @@ def constrastLimit(image):
     img_hist_equalized = cv2.cvtColor(img_hist_equalized, cv2.COLOR_YCrCb2BGR)
     return img_hist_equalized
 
+def contrastLimitCustom(image):
+    # Apply histogram equalization
+    equalized_image = cv2.equalizeHist(image)
+
+    return equalized_image
+
+
 def LaplacianOfGaussian(image):
-    LoG_image = cv2.GaussianBlur(image, (3,3), 0)           # paramter 
-    gray = cv2.cvtColor( LoG_image, cv2.COLOR_BGR2GRAY)
+    LoG_image = cv2.GaussianBlur(image, (5,5), 0)           # paramter 
+    gray = LoG_image
     LoG_image = cv2.Laplacian( gray, cv2.CV_8U,3,3,2)       # parameter
     LoG_image = cv2.convertScaleAbs(LoG_image)
     return LoG_image
     
 def binarization(image):
-    thresh = cv2.threshold(image,35,255,cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(image,45,255,cv2.THRESH_BINARY)[1]
     #thresh = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
     return thresh
 
 def preprocess_image(image):
-    image = constrastLimit(image)
+    cv2.imshow("precontrast",image)
+    image = contrastLimitCustom(image)
+    cv2.imshow('postcontrast',image)
     image = LaplacianOfGaussian(image)
     image = binarization(image)
     return image
@@ -161,11 +170,12 @@ def localization(image, min_size_components, similitary_contour_with_circle, mod
 
     binary_image = removeSmallComponents(binary_image, min_size_components)
 
-    binary_image = cv2.bitwise_and(binary_image,binary_image, mask=remove_other_color(image))
+    #binary_image = cv2.bitwise_and(binary_image,binary_image, mask=remove_other_color(image))
 
     cv2.imshow('Binary',binary_image)
 
     contours = findContour(binary_image)
+    print(contours)
     #signs, coordinates = findSigns(image, contours, similitary_contour_with_circle, 15)
     sign = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
 
@@ -215,10 +225,10 @@ def main(args):
     #Training phase
     model = training()
 
-    sourceImage = cv2.imread(args.file_name)
-    sourceImage = cv2.rotate(sourceImage,cv2.ROTATE_180)
+    sourceImage = cv2.imread(args.file_name)                        #Read the image
+    sourceImage = cv2.rotate(sourceImage,cv2.ROTATE_180)            #Rotate it so the it has the right orientation
+    sourceImage = cv2.cvtColor(sourceImage, cv2.COLOR_BGR2GRAY)     #Convert to grayscale
     #sourceImage = cv2.cvtColor(sourceImage,cv2.COLOR_BGR2GRAY)
-    height,width,channel = sourceImage.shape
 
 
     # initialize the termination criteria for cam shift, indicating
@@ -260,7 +270,7 @@ if __name__ == '__main__':
     parser.add_argument(
       '--file_name',
       #default= "./MVI_1049.avi",
-      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\STOP\\00023.jpg",
+      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\NietInrijden\\00016.jpg",
       help= "Video to be analyzed"
       )
     
@@ -275,7 +285,7 @@ if __name__ == '__main__':
     parser.add_argument(
       '--similitary_contour_with_circle',
       type = float,
-      default= 0.50,
+      default= 0.60,
       help= "Similitary to a circle"
       )
     
