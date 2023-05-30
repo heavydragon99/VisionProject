@@ -105,4 +105,4 @@ plt.show()
 # # Accuracy with the test data
 # print(accuracy_score(labels, pred))
 
-# model.save('traffic_classifier_custom.h5')
+model.save('traffic_classifier_custom.h5')
