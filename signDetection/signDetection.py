@@ -7,7 +7,9 @@ import numpy as np
 from math import sqrt
 #from skimage.feature import blob_dog, blob_log, blob_doh
 import imutils
-import argparse
+
+min_size_components = 300
+similitary_contour_with_circle = 0.60
 
 model = load_model('traffic_classifier_7bordenv3.h5')
 
@@ -30,9 +32,9 @@ def classify(image):
     pred_probs = model.predict(image)  # Get predicted probabilities for each class
     pred = np.argmax(pred_probs)  # Get the class label with highest probability using np.argmax
 
-    #print(pred)
     sign = classes[pred + 1]
-    print(sign)
+
+    return sign
 
 
 ### Preprocess image
@@ -187,50 +189,27 @@ def remove_line(img):
                 cv2.line(mask,(x1,y1),(x2,y2),(0,0,0),2)
     return cv2.bitwise_and(img, img, mask=mask)
 
-def main(args):
-    sourceImage = cv2.imread(args.file_name)                        #Read the image
+def detectSign(file):
+    sourceImage = file
     sourceImage = cv2.rotate(sourceImage,cv2.ROTATE_180)            #Rotate it so the it has the right orientation
     sourceImage = cv2.cvtColor(sourceImage, cv2.COLOR_BGR2GRAY)     #Convert to grayscale
 
     frame = cv2.resize(sourceImage, (640,480))
+    
+    croppedSign = localization(frame, min_size_components, similitary_contour_with_circle)
 
-    croppedSign = localization(frame, args.min_size_components, args.similitary_contour_with_circle)
+    if croppedSign is None:
+        print("no signs")
+    else:
+        cv2.imshow('Result', croppedSign)
+        signName = classify(croppedSign)
 
-    cv2.imshow('Result', croppedSign)
-    classify(croppedSign)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+    return signName
 
+file = cv2.imread("C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\50\\00015.jpg")
+name = detectSign(file)
 
-
-
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="NLP Assignment Command Line")
-    
-    parser.add_argument(
-      '--file_name',
-      #default= "./MVI_1049.avi",
-      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\StoplichtGeel\\00005.jpg",
-      help= "Video to be analyzed"
-      )
-    
-    parser.add_argument(
-      '--min_size_components',
-      type = int,
-      default= 300,
-      help= "Min size component to be reserved"
-      )
-
-    
-    parser.add_argument(
-      '--similitary_contour_with_circle',
-      type = float,
-      default= 0.60,
-      help= "Similitary to a circle"
-      )
-    
-    args = parser.parse_args()
-    main(args)
+print(name)
