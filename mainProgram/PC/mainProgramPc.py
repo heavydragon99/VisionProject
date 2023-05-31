@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 import socket
 import time
+from signDetection import detectSign
+
 
 #intersection variable
 intersectionBacklogIndex = 0
@@ -11,9 +13,12 @@ intersectionBacklog = np.full(10, '', dtype=object)
 intersectionFound = False
 intersectionWait = False
 
+#bord detected
+LastSign = ""
+
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.208'
+IP_ADDRESS = '192.168.137.41'
 PORT = 8080
 
 # Create socket object
@@ -25,16 +30,16 @@ client_socket.settimeout(1000)
 
 try:
     client_socket.getpeername()
-    print("Socket is connected.")
+    #print("Socket is connected.")
     client_socket.sendall(b"ready")
 except OSError:
-    print("Socket is not connected.")
+    #print("Socket is not connected.")
     client_socket.close
     exit
 
 #client_socket.send(b'ready')
 response = client_socket.recv(16)
-print(response)
+#print(response)
 if(response != b'ready'):
     exit
 
@@ -49,17 +54,17 @@ while True:
         try:
             # Attempt a small operation on the socket
             client_socket.getpeername()
-            print("Socket is still open.")
+            #print("Socket is still open.")
             break
         except socket.error:
-            print("Socket is closed.")
+            #print("Socket is closed.")
             client_socket.connect((IP_ADDRESS, PORT))
     
     img_size_str = client_socket.recv(16)
     decoded_string = img_size_str.decode('utf-8', 'ignore')
     substring = decoded_string[:5]
     img_size = int(substring)
-    print("img_size" + str(img_size))
+    #print("img_size" + str(img_size))
     client_socket.sendall(b"sizeok")
 
     # Receive image data from server
@@ -79,7 +84,9 @@ while True:
 
     img = cv2.rotate(img, cv2.ROTATE_180)
     
- 
+    
+    
+
     #img = roadDetection.readImage('C:\\VisionProject\\Pictures\\HVGA\\Weg\\00044.jpg',cv2.ROTATE_180)
 
     #gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # temp
@@ -97,111 +104,141 @@ while True:
     usableHeight = 185
     imageWidth = 480
 
-    img = roadDetection.__cropImage(img,usableHeight,0,0,0)
-    correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight,imgVisual=img)
-    intersection,length = roadDetection.checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth,imgVisual=img)
-    print("length: "+ str(length))
-    print("intersection: "+ str(intersection))   
-        
-    #only for visualizing
-    #edges = roadDetection.__cropImage(edges,usableHeight,0,0,0)
-    #cv2.imshow('Edges', edges)
-    # end only for visualizing 
-
-    #only for visualizing
-
-    #cv2.imshow('img from nicla', img)
-    # end only for visualizing 
-  
-    intersectionBacklog[intersectionBacklogIndex] = str(intersection)
-    intersectionBacklogIndex = (intersectionBacklogIndex + 1) % len(intersectionBacklog)
-    noAction = False
-    print(correction)
-
-    if(intersection != "no intersection"):
-
-        CountInter = 0
-        for i in range(0, len(intersectionBacklog)):
-            if(intersectionBacklog[i] != "no intersection" and intersectionBacklog[i] != "Error could not indentify intersection/corner" and intersectionBacklog[i] != ""):
-                CountInter +=1
-        if(CountInter > 5):
-            print("intersectionFound!!!")
-            intersectionFound = True
-
-        if(intersectionWait == False and length > 55):
-            if(correction == None or correction == -999):
-                client_socket.sendall(b"0")
-            elif(correction < -50):
-                client_socket.sendall(b"0")
-            elif(correction > -5):
-                client_socket.sendall(b"0")
-            else:
-                client_socket.sendall(b"0")
 
 
-            #client_socket.sendall(b"0")
-            noAction = True
-            intersectionWait = True
-       
-        elif(intersectionFound == True and length > 55):
-            for i in range(0,len(intersectionBacklog)-1):
-                index = 0
-                if(intersectionBacklogIndex - i -1 < 0):
-                    index = len(intersectionBacklog)-1 + intersectionBacklogIndex - i
-                else:
-                    index = intersectionBacklogIndex - i
+    #img = roadDetection.__cropImage(img,usableHeight,0,0,0)
+    #currentSign = detectSign(file=img)
+    currentSign = "No Sign"
+    if(currentSign != "No Sign" and LastSign != currentSign):
+        print("sign" + currentSign)
+        cv2.waitKey(2000)
+        #send data
+        if(currentSign == "50 (0)"):
+            client_socket.sendall(b"9")
+        elif(currentSign == "Verboden auto (1)"):
+            client_socket.sendall(b"8")
+        elif(currentSign == "stop (2)"):
+            client_socket.sendall(b"6")
+        elif(currentSign == "Verboden in te rijden (3)"):
+            client_socket.sendall(b"7")
+        elif(currentSign == "Stoplicht rood (4)"):
+            client_socket.sendall(b"10")
+        elif(currentSign == "Stoplicht oranje (5)"):
+            client_socket.sendall(b"11")
+        elif(currentSign == "Stoplicht groen (6)"):
+            client_socket.sendall(b"12")
+        LastSign = currentSign
+    else:
 
-                if(intersectionBacklog[index] != "no intersection" and intersectionBacklog[index] != "Error could not indentify intersection/corner" and intersectionBacklog[index] != ""):
-                    currentInter = intersectionBacklog[index]
-                    break
-            intersectionBacklog = np.full(10, '', dtype=object)
-
+        correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight,imgVisual=img)
+        intersection,length = roadDetection.checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth,imgVisual=img)
+        print("length: "+ str(length))
+        print("intersection: "+ str(intersection))   
             
-            print("currentInter " + str(currentInter))
-            InverseLength = usableHeight-length
-            intersectionFound = False
-            byte_string = b""
-            if(currentInter != "rightCorner" and currentInter != "leftCorner"):
-                user_input = input("Enter direction: ")
-                byte_string = b"" + user_input.encode() + b"|" + str(InverseLength).encode()
-            elif(currentInter == "rightCorner"):
-                byte_string = b"right" + b"|" + str(InverseLength).encode()
-            elif(currentInter == "leftCorner"):
-                byte_string = b"left" + b"|" + str(InverseLength).encode()
-            client_socket.sendall(byte_string)
-            noAction = True
-            intersectionWait = False
-        elif(intersectionFound == False and length > 55):
-            client_socket.sendall(b"0")
-            noAction = True
+        #only for visualizing
+        #edges = roadDetection.__cropImage(edges,usableHeight,0,0,0)
+        #cv2.imshow('Edges', edges)
+        # end only for visualizing 
+
+        #only for visualizing
+
+        #cv2.imshow('img from nicla', img)
+        # end only for visualizing 
+    
+        intersectionBacklog[intersectionBacklogIndex] = str(intersection)
+        intersectionBacklogIndex = (intersectionBacklogIndex + 1) % len(intersectionBacklog)
+        noAction = False
+        #print(correction)
+
+        if(intersection != "no intersection"):
+
+            CountInter = 0
+            for i in range(0, len(intersectionBacklog)):
+                if(intersectionBacklog[i] != "no intersection" and intersectionBacklog[i] != "Error could not indentify intersection/corner" and intersectionBacklog[i] != ""):
+                    CountInter +=1
+            if(CountInter > 5):
+                #print("intersectionFound!!!")
+                intersectionFound = True
 
 
-        cv2.imshow('edges', edges)
-        cv2.waitKey(1)
-        time.sleep(0.001)
+            if(intersectionWait == False and length > 55):
+                print(correction)
+                print("inter one time")
+                if(correction == None or correction == -999):
+                    client_socket.sendall(b"0")
+                elif(correction < -50):
+                    client_socket.sendall(b"185")
+                    print("inter one right")
+                elif(correction > -5):
+                    client_socket.sendall(b"195")
+                    print("inter one left")
+                else:
+                    client_socket.sendall(b"0")
 
-        #cv2.destroyAllWindows()
-    if(noAction == False):
-        if(correction == None):
-            print("no line/not enough lines detected")
-            client_socket.sendall(b"0")
-            print("sending data for car")
-        elif(correction == -999):
-            print("error")
-            client_socket.sendall(b"0")
-            print("sending data for car")
-        elif(correction < -50):
-            print("right")
-            client_socket.sendall(b"3")
-            print("sending data for car")
-        elif(correction > -5):
-            print("left")
-            client_socket.sendall(b"2")
-            print("sending data for car")
-        else:
-            print("straight")
-            client_socket.sendall(b"1")
-            print("sending data for car")
+
+                #client_socket.sendall(b"0")
+                noAction = True
+                intersectionWait = True
+        
+            elif(intersectionFound == True and length > 55):
+                for i in range(0,len(intersectionBacklog)-1):
+                    index = 0
+                    if(intersectionBacklogIndex - i -1 < 0):
+                        index = len(intersectionBacklog)-1 + intersectionBacklogIndex - i
+                    else:
+                        index = intersectionBacklogIndex - i
+
+                    if(intersectionBacklog[index] != "no intersection" and intersectionBacklog[index] != "Error could not indentify intersection/corner" and intersectionBacklog[index] != ""):
+                        currentInter = intersectionBacklog[index]
+                        break
+                intersectionBacklog = np.full(10, '', dtype=object)
+
+                
+                #print("currentInter " + str(currentInter))
+                InverseLength = usableHeight-length
+                intersectionFound = False
+                byte_string = b""
+                if(currentInter != "rightCorner" and currentInter != "leftCorner"):
+                    user_input = input("Enter direction: ")
+                    byte_string = b"" + user_input.encode() + b"|" + str(InverseLength).encode()
+                elif(currentInter == "rightCorner"):
+                    byte_string = b"right" + b"|" + str(InverseLength).encode()
+                elif(currentInter == "leftCorner"):
+                    byte_string = b"left" + b"|" + str(InverseLength).encode()
+                client_socket.sendall(byte_string)
+                noAction = True
+                intersectionWait = False
+            elif(intersectionFound == False and length > 55):
+                client_socket.sendall(b"0")
+                noAction = True
+
+
+            #cv2.imshow('edges', edges)
+            #cv2.waitKey(1)
+            time.sleep(0.001)
+
+            #cv2.destroyAllWindows()
+        if(noAction == False):
+            if(correction == None):
+                #print("no line/not enough lines detected")
+                client_socket.sendall(b"0")
+                #print("sending data for car")
+            elif(correction == -999):
+                #print("error")
+                client_socket.sendall(b"0")
+                #print("sending data for car")
+            elif(correction < -50):
+                #print("right")
+                client_socket.sendall(b"3")
+                #print("sending data for car")
+            elif(correction > -5):
+                #print("left")
+                client_socket.sendall(b"2")
+                #print("sending data for car")
+            else:
+                #print("straight")
+                client_socket.sendall(b"1")
+                #print("sending data for car")
     
 
     #if(correction != -999):

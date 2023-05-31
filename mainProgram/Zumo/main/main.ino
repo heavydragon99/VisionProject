@@ -8,8 +8,9 @@ const int sendPin = 4;
 const int led = LED_BUILTIN;
 Zumo32U4Motors motors;
 Zumo32U4Encoders encoders;
+Zumo32U4OLED display;
 int inputValue;
-int motorValue; //msb t/m 4 is voor motor, 3 t/m lsb is voor borden
+int motorValue;
 int bits[8] = {0,0,0,0,0,0,0,0};
 
 int countLoops = 0;
@@ -134,8 +135,10 @@ int receiveByte()
 
 void processCommand(unsigned commandValue)
 {
+   display.clear();
    Serial.println("--commandValue--");
    Serial.println(commandValue);
+   //normal driving
    if(commandValue == 0)
    {
     motors.setSpeeds(0, 0);
@@ -152,60 +155,91 @@ void processCommand(unsigned commandValue)
    {
     motors.setSpeeds(100, 75);
    }
+   //intersection handeling
    else if(commandValue == 4)
    {
+    display.print("turn left");
     turn(-90);
    }
    else if(commandValue == 5)
    {
+    display.print("turn right");
     turn(90);
    }
+   //signs
+   else if(commandValue == 6)//stop bord
+   {
+    display.print("Stop bord");
+    motors.setSpeeds(0, 0);
+    delay(3000);
+   }
+   else if(commandValue == 7)//verboden in rijden
+   {
+    display.print("verboden");
+    display.gotoXY(0,1);
+    display.print("rijden");
+    drive(1000);
+    turn(180);
+   }
+   else if(commandValue == 8)//verboden auto
+   {
+    display.print("verboden");
+    display.gotoXY(0,1);
+    display.print("auto");
+    drive(1000);
+    turn(-180);
+   }
+   else if(commandValue == 9)//50 bord
+   {
+    display.print("50");
+    motors.setSpeeds(200, 200);
+   }
+   //traffic lights
+   else if(commandValue == 10)//rood
+   {
+    display.print("stoplicht");
+    display.gotoXY(0,1);
+    display.print("rood");
+    motors.setSpeeds(0, 0);
+   }
+   else if(commandValue == 11)//geel
+   {
+    display.print("stoplicht");
+    display.gotoXY(0,1);
+    display.print("geel");
+    motors.setSpeeds(100, 100);
+   }
+   else if(commandValue == 12)//groen
+   {
+    display.print("stoplicht");
+    display.gotoXY(0,1);
+    display.print("groen");
+    motors.setSpeeds(100, 100);
+   }
+   //intersection handeling
+   else if(commandValue > 180 && commandValue <= 190)  // turn right
+   {
+    motors.setSpeeds(125, -125);
+    delay(commandValue-180);
+    motors.setSpeeds(0, 0);
+   }
+
+   else if(commandValue > 190 && commandValue <= 200) // turn left
+   {
+    motors.setSpeeds(-125, 125);
+    delay(commandValue-190);
+    motors.setSpeeds(0, 0);
+   }
+   
    else if(commandValue > 200 && commandValue <= 255)
    {
+    display.print("intersection");
+    display.gotoXY(0,1);
+    display.print((commandValue-200));
     int count = commandValue -200;
     count = count*50;
     drive(count);
    }
-
-  
-//  switch (commandValue)
-//  {
-//   
-//
-//
-//    
-//    //follow lines
-//    case 0:
-//      motors.setLeftSpeed(0);
-//      motors.setRightSpeed(0);
-//      break;
-//    case 1:
-//      motors.setLeftSpeed(100);
-//      motors.setRightSpeed(100);
-//      //vooruit
-//      break;
-//    case 2:
-//      motors.setLeftSpeed(75);
-//      motors.setRightSpeed(100);
-//      //links
-//      break;
-//    case 3:
-//      motors.setLeftSpeed(100);
-//      motors.setRightSpeed(75);
-//      break;
-//    // intersection handeling
-//    case 4:
-//      turn(-90);
-//      break;
-//    case 5:
-//      turn(90);
-//      break;
-//    case :
-//      drive(200);
-//      break;
-//    default:
-//      break;
-//  }
 }
 
 void setup() {
@@ -219,18 +253,15 @@ void setup() {
   digitalWrite(toNicla,LOW);
   digitalWrite(led,HIGH);
   motorValue = 0;
+  display.clear();
+  display.print("Starting");
   delay(1000);
 
 }
 
-/////////////TO DO: ZORGEN DAT ER EEN TWEEDE LIJN KOMT DIE DATA REQUEST
 void loop() {
-  
-//  while(checkSilence())
-//  {
-//  }
-  //delay(5000);
-  //Serial.println("request now");
+  display.clear();
+  display.print("Running");
   requestData();
   bool checkStart = waitForStart();
 
@@ -244,9 +275,6 @@ void loop() {
     }
     countLoops = 0;
   }
-  
-  //Serial.println();
-
   Serial.println("countLoops-");
   Serial.println(countLoops);
   if(countLoops < 10)

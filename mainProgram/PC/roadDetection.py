@@ -18,7 +18,7 @@ def __drawLines(lines,img):
             x2 = int(x0 - 1000*(-b))
             y2 = int(y0 - 1000*(a))
             cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-        cv2.imshow('Image from Socket', img)
+        # cv2.imshow('Image from Socket', img)
     # end visualize 
 
 def readImage(imgpath,rotateValue):
@@ -113,7 +113,7 @@ def checkSides(middleOfScreen,edges,usableImageHeight,imgVisual):
         lineXValues.append(cvalueTest)
 
     if(lineXValues is None):
-        print("not enough lines")
+        # print("not enough lines")
         return -999
     # 4 lines 2r - 2l
     if(len(lineXValues) == 4):
@@ -124,10 +124,10 @@ def checkSides(middleOfScreen,edges,usableImageHeight,imgVisual):
         return correction
     # 3 lines
     elif(len(lineXValues) == 3):
-        print("3 lines")
+        # print("3 lines")
         # 2l - 1r
         if(linesLeft is not None and len(linesLeft) == 2):
-            print("left lines")
+            # print("left lines")
             left = (lineXValues[0] + lineXValues[1]) /2
             middle = (left + lineXValues[2]) / 2
             correction = middleOfScreen - middle
@@ -135,23 +135,23 @@ def checkSides(middleOfScreen,edges,usableImageHeight,imgVisual):
             return correction
         # 1l - 2r
         else:
-            print("right lines")
+            # print("right lines")
             right = (lineXValues[1] + lineXValues[2]) /2
             middle = (right + lineXValues[0]) / 2
             correction = middleOfScreen - middle
             return correction
     # more then 4 lines
     elif(len(lineXValues) == 2 and linesLeft is not None and linesRight is not None):
-        print("2 lines 1l 1r")
+        # print("2 lines 1l 1r")
         middle = (lineXValues[0] + lineXValues[1]) / 2
         correction = middleOfScreen - middle
         return correction
     elif(len(lineXValues) > 4):
-        print("to many lines")
+        # print("to many lines")
         return -999
     # other then above
     else:
-        print("not enough lines")
+        # print("not enough lines")
         return -999
     
 def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
@@ -186,7 +186,7 @@ def checkIntersections(edges,usableImageHeight,imageWidth,imgVisual):
         rho, theta = line[0]
         b = np.sin(theta)
         y0 = b * rho
-        print("y0" + str(y0))
+        # print("y0" + str(y0))
         lengthToIntersection = lengthToIntersection + y0
         amount += 1
 
