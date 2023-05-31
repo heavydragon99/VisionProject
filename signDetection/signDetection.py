@@ -13,24 +13,14 @@ from math import sqrt
 #from skimage.feature import blob_dog, blob_log, blob_doh
 import imutils
 import argparse
-import os
-import math
 
 from classification import training, getLabel
 
-model = load_model('traffic_classifier_7bordenv2.h5')
+model = load_model('traffic_classifier_7bordenv3.h5')
 
 ##PERHAPS VERBETERING:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: het formaat van de crop standaard iets vergroten, zodat de kans dat het bord er op staat groter is
 
-# SIGNS = ["ERROR",
-#         "STOP",
-#         "TURN LEFT",
-#         "TURN RIGHT",
-#         "DO NOT TURN LEFT",
-#         "DO NOT TURN RIGHT",
-#         "ONE WAY",
-#         "SPEED LIMIT",
-#         "fout"]
+
 
 # Dictionary to label all traffic signs class.
 classes = {1: '50 (0)',
@@ -203,19 +193,15 @@ def findSigns(image, contours, threshold, distance_theshold):
             coordinates.append([(top-2,left-2),(right+1,bottom+1)])
     return signs, coordinates
 
-def localization(image, min_size_components, similitary_contour_with_circle, model, count, current_sign_type):
+def localization(image, min_size_components, similitary_contour_with_circle):
     original_image = image.copy()
     binary_image = preprocess_image(image)
 
     binary_image = removeSmallComponents(binary_image, min_size_components)
 
-    #binary_image = cv2.bitwise_and(binary_image,binary_image, mask=remove_other_color(image))
-
     cv2.imshow('Binary',binary_image)
 
     contours = findContour(binary_image)
-    #print(contours)
-    #signs, coordinates = findSigns(image, contours, similitary_contour_with_circle, 15)
     sign = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
 
     return sign
@@ -233,65 +219,14 @@ def remove_line(img):
                 cv2.line(mask,(x1,y1),(x2,y2),(0,0,0),2)
     return cv2.bitwise_and(img, img, mask=mask)
 
-def remove_other_color(img):
-    frame = cv2.GaussianBlur(img, (3,3), 0) 
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    # define range of blue color in HSV
-    lower_blue = np.array([100,128,0])
-    upper_blue = np.array([215,255,255])
-    # Threshold the HSV image to get only blue colors
-    mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
-
-    lower_white = np.array([0,0,128], dtype=np.uint8)
-    upper_white = np.array([255,255,255], dtype=np.uint8)
-    # Threshold the HSV image to get only blue colors
-    mask_white = cv2.inRange(hsv, lower_white, upper_white)
-
-    lower_black = np.array([0,0,0], dtype=np.uint8)
-    upper_black = np.array([170,150,50], dtype=np.uint8)
-
-    mask_black = cv2.inRange(hsv, lower_black, upper_black)
-
-    mask_1 = cv2.bitwise_or(mask_blue, mask_white)
-    mask = cv2.bitwise_or(mask_1, mask_black)
-    # Bitwise-AND mask and original image
-    #res = cv2.bitwise_and(frame,frame, mask= mask)
-    return mask
-
 def main(args):
-	#Clean previous image    
-    #clean_images()
-    #Training phase
-    model = training()
-
     sourceImage = cv2.imread(args.file_name)                        #Read the image
     sourceImage = cv2.rotate(sourceImage,cv2.ROTATE_180)            #Rotate it so the it has the right orientation
     sourceImage = cv2.cvtColor(sourceImage, cv2.COLOR_BGR2GRAY)     #Convert to grayscale
-    #sourceImage = cv2.cvtColor(sourceImage,cv2.COLOR_BGR2GRAY)
 
-
-    # initialize the termination criteria for cam shift, indicating
-    # a maximum of ten iterations or movement by a least one pixel
-    # along with the bounding box of the ROI
-    termination = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
-    roiBox = None
-    roiHist = None
-
-    success = True
-    similitary_contour_with_circle = 0.65   # parameter
-    count = 0
-    current_sign = None
-    current_text = ""
-    current_size = 0
-    sign_count = 0
-    coordinates = []
-    position = []
-    file = open("Output.txt", "w")
-    
     frame = cv2.resize(sourceImage, (640,480))
 
-    #print("Frame:{}".format(count))
-    croppedSign = localization(frame, args.min_size_components, args.similitary_contour_with_circle, model, count, current_sign)
+    croppedSign = localization(frame, args.min_size_components, args.similitary_contour_with_circle)
 
     cv2.imshow('Result', croppedSign)
     classify(croppedSign)
@@ -310,7 +245,7 @@ if __name__ == '__main__':
     parser.add_argument(
       '--file_name',
       #default= "./MVI_1049.avi",
-      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\StoplichtRood\\00023.jpg",
+      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\StoplichtGeel\\00005.jpg",
       help= "Video to be analyzed"
       )
     
