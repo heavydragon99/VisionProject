@@ -18,7 +18,7 @@ import math
 
 from classification import training, getLabel
 
-model = load_model('traffic_classifier_7borden.h5')
+model = load_model('traffic_classifier_7bordenv2.h5')
 
 ##PERHAPS VERBETERING:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: het formaat van de crop standaard iets vergroten, zodat de kans dat het bord er op staat groter is
 
@@ -310,7 +310,7 @@ if __name__ == '__main__':
     parser.add_argument(
       '--file_name',
       #default= "./MVI_1049.avi",
-      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\STOP\\00021.jpg",
+      default= "C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\StoplichtRood\\00023.jpg",
       help= "Video to be analyzed"
       )
     
