@@ -1,6 +1,5 @@
 # Load the trained model to classify sign
 from keras.models import load_model
-
 import cv2
 import numpy as np
 #import matplotlib.pyplot as plt
@@ -14,7 +13,8 @@ similitary_contour_with_circle = 0.60
 model = load_model('traffic_classifier_7bordenv3.h5')
 
 # Dictionary to label all traffic signs class.
-classes = {1: '50 (0)',
+classes = {0: 'None',
+           1: '50 (0)',
            2: 'Verboden auto (1)',
            3: 'stop (2)',
            4: 'Verboden in te rijden (3)',
@@ -32,8 +32,14 @@ def classify(image):
     pred_probs = model.predict(image)  # Get predicted probabilities for each class
     pred = np.argmax(pred_probs)  # Get the class label with highest probability using np.argmax
 
-    sign = classes[pred + 1]
+    max_prob = pred_probs[0, pred]  # Retrieve the predicted probability for the highest class
+    confidence_percent = max_prob * 100  # Calculate the confidence percentage
+    print(confidence_percent)
 
+    if confidence_percent > 80:
+        sign = classes[pred + 1]
+    else:
+        sign=classes[0]    
     return sign
 
 
@@ -170,7 +176,6 @@ def localization(image, min_size_components, similitary_contour_with_circle):
     binary_image = removeSmallComponents(binary_image, min_size_components)
 
     cv2.imshow('Binary',binary_image)
-
     contours = findContour(binary_image)
     sign = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
 
@@ -203,13 +208,13 @@ def detectSign(file):
     else:
         cv2.imshow('Result', croppedSign)
         signName = classify(croppedSign)
+        return signName
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    return classes[0]
 
-    return signName
 
-file = cv2.imread("C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\HVGA\\50\\00015.jpg")
+file = cv2.imread("..\\Pictures\\HVGA\\STOP\\00016.jpg")
 name = detectSign(file)
 
 print(name)
+cv2.waitKey(0)
