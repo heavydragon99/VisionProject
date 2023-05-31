@@ -1,10 +1,5 @@
-import tkinter as tk
-from tkinter import filedialog
-from tkinter import *
-from PIL import ImageTk, Image
 # Load the trained model to classify sign
 from keras.models import load_model
-
 
 import cv2
 import numpy as np
@@ -14,13 +9,7 @@ from math import sqrt
 import imutils
 import argparse
 
-from classification import training, getLabel
-
 model = load_model('traffic_classifier_7bordenv3.h5')
-
-##PERHAPS VERBETERING:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: het formaat van de crop standaard iets vergroten, zodat de kans dat het bord er op staat groter is
-
-
 
 # Dictionary to label all traffic signs class.
 classes = {1: '50 (0)',
@@ -34,10 +23,6 @@ classes = {1: '50 (0)',
 
 def classify(image):
     global label_packed
-    #mijn code
-    #image = image.rotate(180)
-    #einde mijn code
-    #image = image.resize((30, 30))
     image = cv2.cvtColor(image,cv2.COLOR_GRAY2RGB)
     image = cv2.resize(image,(30,30))
     image = np.expand_dims(image, axis=0)
@@ -51,25 +36,10 @@ def classify(image):
 
 
 ### Preprocess image
-def constrastLimit(image):
-    img_hist_equalized = cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)
-    channels = cv2.split(img_hist_equalized)
-    #Mijn zooi
-    channelsToList = list(channels)
-    channelsToList[0] = cv2.equalizeHist(channels[0])
-    #Einde mijn zooi
-    #channels[0] = cv2.equalizeHist(channels[0])
-    #Mijn zooi
-    channels = tuple(channelsToList)
-    #Einde mijn zooi
-    img_hist_equalized = cv2.merge(channels)
-    img_hist_equalized = cv2.cvtColor(img_hist_equalized, cv2.COLOR_YCrCb2BGR)
-    return img_hist_equalized
 
-def contrastLimitCustom(image):
+def contrastLimit(image):
     # Apply histogram equalization
     equalized_image = cv2.equalizeHist(image)
-
     return equalized_image
 
 
@@ -86,9 +56,7 @@ def binarization(image):
     return thresh
 
 def preprocess_image(image):
-    cv2.imshow("precontrast",image)
-    image = contrastLimitCustom(image)
-    #cv2.imshow('postcontrast',image)
+    image = contrastLimit(image)
     image = LaplacianOfGaussian(image)
     image = binarization(image)
     return image
