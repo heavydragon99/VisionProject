@@ -17,11 +17,11 @@
 # img = cv2.rotate(img, cv2.ROTATE_180)                                               #rotate (only needed for humans)
 # gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)                                    #make grayscale
 # gray_template_verbodenAuto = cv2.cvtColor(template_verbodenAuto, cv2.COLOR_BGR2GRAY)                                    #make grayscale
-# gray_template_verbodenInhalen = cv2.cvtColor(template_verbodenInhalen, cv2.COLOR_BGR2GRAY) 
+# gray_template_verbodenInhalen = cv2.cvtColor(template_verbodenInhalen, cv2.COLOR_BGR2GRAY)
 # gray_template_verbodenInRijden = cv2.cvtColor(template_verbodenInRijden, cv2.COLOR_BGR2GRAY)
-# gray_template_50 = cv2.cvtColor(template_50, cv2.COLOR_BGR2GRAY) 
-# gray_template_verbodenStilstaan = cv2.cvtColor(template_verbodenStilstaan, cv2.COLOR_BGR2GRAY) 
-# gray_template_verbodenParkeren = cv2.cvtColor(template_verbodenParkeren, cv2.COLOR_BGR2GRAY)  
+# gray_template_50 = cv2.cvtColor(template_50, cv2.COLOR_BGR2GRAY)
+# gray_template_verbodenStilstaan = cv2.cvtColor(template_verbodenStilstaan, cv2.COLOR_BGR2GRAY)
+# gray_template_verbodenParkeren = cv2.cvtColor(template_verbodenParkeren, cv2.COLOR_BGR2GRAY)
 # blur_img = cv2.medianBlur(gray_img, 3)
 # edges_img = cv2.Canny(gray_img,100,200)                                             #edge detection with canny
 
@@ -41,7 +41,7 @@
 #         radius = i[2]
 #         cv2.circle(img, (x,y), radius, (255, 0, 255), 2)
 
-#     crop_img = gray_img[y-radius:y+radius, x-radius:x+radius]      #crop image to size of detected circle  
+#     crop_img = gray_img[y-radius:y+radius, x-radius:x+radius]      #crop image to size of detected circle
 
 #     width = 200
 #     height = 200
@@ -56,7 +56,7 @@
 #     kp5, des5 = orb.detectAndCompute(gray_template_50,None)
 #     kp6, des6 = orb.detectAndCompute(gray_template_verbodenStilstaan,None)
 #     kp7, des7 = orb.detectAndCompute(gray_template_verbodenParkeren,None)
-    
+
 
 #     # create BFMatcher object
 #     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
@@ -106,8 +106,8 @@
 #     # else:
 #     #     cv2.putText(img,"Inrijden",(0,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0),2)
 
-#     cv2.imshow('resized',resized_img)  
-#     cv2.imshow('detectSign',img)    
+#     cv2.imshow('resized',resized_img)
+#     cv2.imshow('detectSign',img)
 #     cv2.waitKey(0)
 #     cv2.destroyAllWindows()
 
@@ -138,11 +138,11 @@ template_verbodenParkeren = cv2.imread("D:\\Github\\VisionProject\\Pictures\\Tem
 img = cv2.rotate(img, cv2.ROTATE_180)                                               #rotate (only needed for humans)
 gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)                                    #make grayscale
 gray_template_verbodenAuto = cv2.cvtColor(template_verbodenAuto, cv2.COLOR_BGR2GRAY)                                    #make grayscale
-gray_template_verbodenInhalen = cv2.cvtColor(template_verbodenInhalen, cv2.COLOR_BGR2GRAY) 
+gray_template_verbodenInhalen = cv2.cvtColor(template_verbodenInhalen, cv2.COLOR_BGR2GRAY)
 gray_template_verbodenInRijden = cv2.cvtColor(template_verbodenInRijden, cv2.COLOR_BGR2GRAY)
-gray_template_50 = cv2.cvtColor(template_50, cv2.COLOR_BGR2GRAY) 
-gray_template_verbodenStilstaan = cv2.cvtColor(template_verbodenStilstaan, cv2.COLOR_BGR2GRAY) 
-gray_template_verbodenParkeren = cv2.cvtColor(template_verbodenParkeren, cv2.COLOR_BGR2GRAY)  
+gray_template_50 = cv2.cvtColor(template_50, cv2.COLOR_BGR2GRAY)
+gray_template_verbodenStilstaan = cv2.cvtColor(template_verbodenStilstaan, cv2.COLOR_BGR2GRAY)
+gray_template_verbodenParkeren = cv2.cvtColor(template_verbodenParkeren, cv2.COLOR_BGR2GRAY)
 blur_img = cv2.medianBlur(gray_img, 3)
 edges_img = cv2.Canny(gray_img,100,200)                                             #edge detection with canny
 
@@ -162,7 +162,7 @@ if circles is not None:
         radius = i[2]
         cv2.circle(img, (x,y), radius, (255, 0, 255), 2)
 
-    crop_img = gray_img[y-radius:y+radius, x-radius:x+radius]      #crop image to size of detected circle  
+    crop_img = gray_img[y-radius:y+radius, x-radius:x+radius]      #crop image to size of detected circle
 
     width = 200
     height = 200
@@ -171,13 +171,13 @@ if circles is not None:
 
     orb = cv2.ORB_create()
     keyPointsPicture, DescriptorPicture = orb.detectAndCompute(resized_img, None)
-    keyPointsTemplate_verbodenAuto, DescriptorTemplate_verbodenAuto = orb.detectAndCompute(gray_template_verbodenAuto, None)    
+    keyPointsTemplate_verbodenAuto, DescriptorTemplate_verbodenAuto = orb.detectAndCompute(gray_template_verbodenAuto, None)
     keyPointsTemplate_verbodenInhalen, DescriptorTemplate_verbodenInhalen = orb.detectAndCompute(gray_template_verbodenInhalen,None)
     keyPointsTemplate_verbodenInRijden, DescriptorTemplate_verbodenInRijden = orb.detectAndCompute(gray_template_verbodenInRijden,None)
     keyPointsTemplate_50, DescriptorTemplate_50 = orb.detectAndCompute(gray_template_50,None)
     keyPointsTemplate_verbodenStilstaan, DescriptorTemplate_verbodenStilstaan = orb.detectAndCompute(gray_template_verbodenStilstaan,None)
     keyPointsTemplate_verbodenParkeren, DescriptorTemplate_verbodenParkeren = orb.detectAndCompute(gray_template_verbodenParkeren,None)
-    
+
 
     # create BFMatcher object
     matcher = cv2.BFMatcher(cv2.NORM_HAMMING2,crossCheck=True)
@@ -188,7 +188,7 @@ if circles is not None:
     matches_50                  = matcher.match(DescriptorTemplate_50,DescriptorPicture)
     matches_verbodenStilstaan   = matcher.match(DescriptorTemplate_verbodenStilstaan,DescriptorPicture)
     matches_verbodenParkeren    = matcher.match(DescriptorTemplate_verbodenParkeren,DescriptorPicture)
-   
+
     final_img1 = cv2.drawMatches(gray_template_verbodenAuto, keyPointsTemplate_verbodenAuto,
     resized_img, keyPointsPicture, matches_verbodenAuto[:50],None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
     final_img2 = cv2.drawMatches(gray_template_verbodenInhalen, keyPointsTemplate_verbodenInhalen,
@@ -202,7 +202,7 @@ if circles is not None:
     final_img6 = cv2.drawMatches(gray_template_verbodenParkeren, keyPointsTemplate_verbodenParkeren,
     resized_img, keyPointsPicture, matches_verbodenParkeren[:50],None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-    
+
 
     score_VerbodenAuto = len(matches_verbodenAuto) / len(keyPointsTemplate_verbodenAuto) * 100
     score_VerbodenInhalen = len(matches_verbodenInhalen) / len(keyPointsTemplate_verbodenInhalen) * 100
@@ -230,11 +230,11 @@ if circles is not None:
     print(score_VerbodenParkeren)
 
     cv2.imshow('final1',final_img1)
-    cv2.imshow('final2',final_img2)   
-    #cv2.imshow('final3',final_img3)   
-    cv2.imshow('final4',final_img4)   
-    cv2.imshow('final5',final_img5)   
-    cv2.imshow('final6',final_img6)      
+    cv2.imshow('final2',final_img2)
+    #cv2.imshow('final3',final_img3)
+    cv2.imshow('final4',final_img4)
+    cv2.imshow('final5',final_img5)
+    cv2.imshow('final6',final_img6)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
