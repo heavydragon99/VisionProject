@@ -3,15 +3,17 @@ import roadDetection
 import cv2
 import numpy as np
 import socket
+import time
 
 #intersection variable
 intersectionBacklogIndex = 0
 intersectionBacklog = np.full(10, '', dtype=object)
 intersectionFound = False
+intersectionWait = False
 
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.12'
+IP_ADDRESS = '192.168.137.208'
 PORT = 8080
 
 # Create socket object
@@ -118,52 +120,66 @@ while True:
 
     if(intersection != "no intersection"):
 
-        tempbufferName = np.full(10, '', dtype=object)
-        tempbufferCount = np.zeros(10)
-        tempbufferIndex = 0
-        for inter in intersectionBacklog:
-            added = False
-            for i in range(0, len(tempbufferName)-1):
-                if(inter == tempbufferName[i] and inter != "no intersection" and inter != ""):
-                    tempbufferCount[i] += 1
-                    added = True
-                    break
-            if(added == False and inter != "no intersection" and inter != ""):
-                tempbufferName[tempbufferIndex] = inter
-                tempbufferCount[tempbufferIndex] = 1
-                tempbufferIndex += 1
-        tempinterIndexHighest = 0
-        HighestDuplicate = 0
-        tempIndex = 0
-        for tempinter in tempbufferCount:
-            if(tempinter > HighestDuplicate):
-               HighestDuplicate = tempinter
-               tempinterIndexHighest = tempIndex
-            tempIndex +=1
-        if(HighestDuplicate > 4):
-            print("HighestDuplicate" + str(HighestDuplicate))
-            print("intersectionFound!!!" + str(tempbufferName[tempinterIndexHighest]))
+        CountInter = 0
+        for i in range(0, len(intersectionBacklog)):
+            if(intersectionBacklog[i] != "no intersection" and intersectionBacklog[i] != "Error could not indentify intersection/corner" and intersectionBacklog[i] != ""):
+                CountInter +=1
+        if(CountInter > 5):
+            print("intersectionFound!!!")
             intersectionFound = True
+
+        if(intersectionWait == False and length > 55):
+            if(correction == None or correction == -999):
+                client_socket.sendall(b"0")
+            elif(correction < -50):
+                client_socket.sendall(b"0")
+            elif(correction > -5):
+                client_socket.sendall(b"0")
+            else:
+                client_socket.sendall(b"0")
+
+
+            #client_socket.sendall(b"0")
+            noAction = True
+            intersectionWait = True
+       
+        elif(intersectionFound == True and length > 55):
+            for i in range(0,len(intersectionBacklog)-1):
+                index = 0
+                if(intersectionBacklogIndex - i -1 < 0):
+                    index = len(intersectionBacklog)-1 + intersectionBacklogIndex - i
+                else:
+                    index = intersectionBacklogIndex - i
+
+                if(intersectionBacklog[index] != "no intersection" and intersectionBacklog[index] != "Error could not indentify intersection/corner" and intersectionBacklog[index] != ""):
+                    currentInter = intersectionBacklog[index]
+                    break
             intersectionBacklog = np.full(10, '', dtype=object)
 
-
-        if(intersectionFound == True and length > 50):
-
+            
+            print("currentInter " + str(currentInter))
             InverseLength = usableHeight-length
             intersectionFound = False
             byte_string = b""
-            if(tempbufferName[tempinterIndexHighest] != "rightCorner" and tempbufferName[tempinterIndexHighest] != "leftCorner"):
+            if(currentInter != "rightCorner" and currentInter != "leftCorner"):
                 user_input = input("Enter direction: ")
                 byte_string = b"" + user_input.encode() + b"|" + str(InverseLength).encode()
-            elif(tempbufferName[tempinterIndexHighest] == "rightCorner"):
+            elif(currentInter == "rightCorner"):
                 byte_string = b"right" + b"|" + str(InverseLength).encode()
-            elif(tempbufferName[tempinterIndexHighest] == "leftCorner"):
+            elif(currentInter == "leftCorner"):
                 byte_string = b"left" + b"|" + str(InverseLength).encode()
             client_socket.sendall(byte_string)
             noAction = True
+            intersectionWait = False
+        elif(intersectionFound == False and length > 55):
+            client_socket.sendall(b"0")
+            noAction = True
+
 
         cv2.imshow('edges', edges)
         cv2.waitKey(1)
+        time.sleep(0.001)
+
         #cv2.destroyAllWindows()
     if(noAction == False):
         if(correction == None):
@@ -174,11 +190,11 @@ while True:
             print("error")
             client_socket.sendall(b"0")
             print("sending data for car")
-        elif(correction < -60):
+        elif(correction < -50):
             print("right")
             client_socket.sendall(b"3")
             print("sending data for car")
-        elif(correction > 5):
+        elif(correction > -5):
             print("left")
             client_socket.sendall(b"2")
             print("sending data for car")

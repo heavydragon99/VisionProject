@@ -78,6 +78,22 @@ void turn(long degree) {
   motors.setSpeeds(0, 0);
 }
 
+void drive(long count) {
+  encoders.getCountsAndResetLeft();
+  encoders.getCountsAndResetRight();
+
+  long countsLeft = 0;
+  long countsRight = 0;
+
+  motors.setSpeeds(100, 100);
+  while(countsLeft < count and countsRight < count) {
+  countsLeft += encoders.getCountsAndResetLeft();
+  countsRight += encoders.getCountsAndResetRight();
+  delay(2);
+  }
+  motors.setSpeeds(0, 0);
+}
+
 void requestData()
 {
   digitalWrite(toNicla,HIGH); //ready to receive
@@ -118,35 +134,78 @@ int receiveByte()
 
 void processCommand(unsigned commandValue)
 {
-  switch (commandValue)
-  {
-    case 0:
-      motors.setLeftSpeed(0);
-      motors.setRightSpeed(0);
-      break;
-    case 1:
-      motors.setLeftSpeed(100);
-      motors.setRightSpeed(100);
-      //vooruit
-      break;
-    case 2:
-      motors.setLeftSpeed(75);
-      motors.setRightSpeed(100);
-      //links
-      break;
-    case 3:
-      motors.setLeftSpeed(100);
-      motors.setRightSpeed(75);
-      break;
-    case 4:
-      turn(-90);
-      break;
-    case 5:
-      turn(90);
-      break;
-    default:
-      break;
-  }
+   Serial.println("--commandValue--");
+   Serial.println(commandValue);
+   if(commandValue == 0)
+   {
+    motors.setSpeeds(0, 0);
+   }
+   else if(commandValue == 1)
+   {
+    motors.setSpeeds(100, 100);
+   }
+   else if(commandValue == 2)
+   {
+    motors.setSpeeds(75, 100);
+   }
+   else if(commandValue == 3)
+   {
+    motors.setSpeeds(100, 75);
+   }
+   else if(commandValue == 4)
+   {
+    turn(-90);
+   }
+   else if(commandValue == 5)
+   {
+    turn(90);
+   }
+   else if(commandValue > 200 && commandValue <= 255)
+   {
+    int count = commandValue -200;
+    count = count*50;
+    drive(count);
+   }
+
+  
+//  switch (commandValue)
+//  {
+//   
+//
+//
+//    
+//    //follow lines
+//    case 0:
+//      motors.setLeftSpeed(0);
+//      motors.setRightSpeed(0);
+//      break;
+//    case 1:
+//      motors.setLeftSpeed(100);
+//      motors.setRightSpeed(100);
+//      //vooruit
+//      break;
+//    case 2:
+//      motors.setLeftSpeed(75);
+//      motors.setRightSpeed(100);
+//      //links
+//      break;
+//    case 3:
+//      motors.setLeftSpeed(100);
+//      motors.setRightSpeed(75);
+//      break;
+//    // intersection handeling
+//    case 4:
+//      turn(-90);
+//      break;
+//    case 5:
+//      turn(90);
+//      break;
+//    case :
+//      drive(200);
+//      break;
+//    default:
+//      break;
+//  }
 }
 
 void setup() {
@@ -161,6 +220,7 @@ void setup() {
   digitalWrite(led,HIGH);
   motorValue = 0;
   delay(1000);
+
 }
 
 /////////////TO DO: ZORGEN DAT ER EEN TWEEDE LIJN KOMT DIE DATA REQUEST
@@ -191,9 +251,7 @@ void loop() {
   Serial.println(countLoops);
   if(countLoops < 10)
   {
-      Serial.println("motorValue-");
-      Serial.println(ReceivedValue);
-    processCommand(motorValue);
+    processCommand(ReceivedValue);
   }
   else
   {

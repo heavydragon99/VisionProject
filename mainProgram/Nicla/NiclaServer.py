@@ -127,37 +127,39 @@ def sendImageRecieveCommand():
                         float_value = float(str(length))
                         rounded_value = round(float_value)
                         int_value = int(rounded_value)
-                        print(direction)
-                        print(int_value)
-                        amount = (int_value/8)+1
+                        int_length = int_value-60
+                        sendLength = int_length + 200
+                        if(sendLength >= 255):
+                            sendLength = 254
                     else:
                         direction = str(response)
                     #todo intersection handeling
                     if(direction == "left"):
+                        print("left")
                         print("amount:" + str(amount))
-                        for i in range(0, amount):
-                            uartSendData(1)
-                            pyb.delay(130)
+                        uartSendData(sendLength)
+                        pyb.delay(1000)
                         uartSendData(4)
                         uartSendData(0)
                         print("end left")
                     elif(direction == "right"):
+                        print("right")
                         print("amount:" + str(amount))
-                        for i in range(0, amount):
-                            uartSendData(1)
-                            pyb.delay(130)
+                        uartSendData(sendLength)
+                        pyb.delay(1000)
                         uartSendData(5)
                         uartSendData(0)
                         print("end right")
                     elif(direction == "up"):
+                        print("up")
                         print("amount:" + str(amount))
-                        for i in range(0, (amount+2)):
-                            uartSendData(1)
-                            pyb.delay(130)
+                        uartSendData(sendLength)
+                        pyb.delay(1000)
                         uartSendData(0)
                         print("end up")
 
                     else:
+                        print("normal")
                         uartSendData(int(response))
                 else:
                     print("Error: ", e)
