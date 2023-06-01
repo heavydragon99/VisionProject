@@ -18,7 +18,7 @@ signBacklogIndex = 0
 signBacklog = np.full(3, '', dtype=object)
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.156'
+IP_ADDRESS = '192.168.137.188'
 PORT = 8080
 
 # Create socket object
@@ -122,25 +122,25 @@ while True:
         print("Current most detected sign is: " + currentSign)
         if(currentSign == "50 (0)"):
             client_socket.sendall(b"9")
-            print("9")
+            #print("9")
         elif(currentSign == "Verboden auto (1)"):
             client_socket.sendall(b"8")
-            print("8")
+            #print("8")
         elif(currentSign == "stop (2)"):
             client_socket.sendall(b"6")
-            print("6")
+            #print("6")
         elif(currentSign == "Verboden in te rijden (3)"):
             client_socket.sendall(b"7")
-            print("7")
+            #print("7")
         elif(currentSign == "Stoplicht rood (4)"):
             client_socket.sendall(b"10")
-            print("10")
+            #print("10")
         elif(currentSign == "Stoplicht oranje (5)"):
             client_socket.sendall(b"11")
-            print("11")
+            #print("11")
         elif(currentSign == "Stoplicht groen (6)"):
             client_socket.sendall(b"12")   
-            print("12")       
+            #print("12")       
     else:
 
         correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight,imgVisual=img)
@@ -170,19 +170,19 @@ while True:
                 if(intersectionBacklog[i] != "no intersection" and intersectionBacklog[i] != "Error could not indentify intersection/corner" and intersectionBacklog[i] != ""):
                     CountInter +=1
             if(CountInter > 2):
-                print(CountInter)
-                print("intersectionFound!!!")
+                #print(CountInter)
+                #print("intersectionFound!!!")
                 intersectionFound = True
 
 
             if(intersectionWait == False and length > 50):
-                print(correction)
-                print("inter one time")
+                #print(correction)
+                #print("inter one time")
                 if(correction == None or correction == -999):
                     client_socket.sendall(b"0")
                 elif(correction < -40):
                     client_socket.sendall(b"185")
-                    print("inter one right")
+                    #print("inter one right")
                 elif(correction > -15):
                     client_socket.sendall(b"195")
                     #print("inter one left")
@@ -195,7 +195,7 @@ while True:
                 intersectionWait = True
             
             elif(intersectionWait == True):
-                print("intersectionWait" + str(intersectionWait))
+                #print("intersectionWait" + str(intersectionWait))
                 last_added_index = (intersectionBacklogIndex - 1) % len(intersectionBacklog)
                 last_added_value = intersectionBacklog[last_added_index]
                 previous_value = ""
@@ -205,7 +205,7 @@ while True:
                     last_added_index = (last_added_index - 1) % len(intersectionBacklog)
                     last_added_value = intersectionBacklog[last_added_index]
 
-                print("last_added_value" + str(last_added_value))
+                #print("last_added_value" + str(last_added_value))
                 currentInter = last_added_value
                 # for i in range(0,len(intersectionBacklog)-1):
                 #     index = 0
@@ -228,8 +228,8 @@ while True:
                 intersectionFound = False
                 byte_string = b""
                 if(currentInter != "rightCorner" and currentInter != "leftCorner"):
-                    #user_input = input("Enter direction: ")
-                    user_input = "up"
+                    user_input = input("Enter direction: ")
+                    #user_input = "up"
                     byte_string = b"" + user_input.encode() + b"|" + str(InverseLength).encode()
                 elif(currentInter == "rightCorner"):
                     byte_string = b"right" + b"|" + str(InverseLength).encode()

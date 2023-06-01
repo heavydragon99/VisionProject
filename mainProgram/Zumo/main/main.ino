@@ -16,6 +16,8 @@ int bits[8] = {0,0,0,0,0,0,0,0};
 int countLoops = 0;
 int ReceivedValue = 0;
 
+bool checkStoplicht = false;
+
 int checkSilence()  //Check wheter no messages are currently being received
 {
   int canstart=0;
@@ -159,13 +161,17 @@ void processCommand(unsigned commandValue)
    else if(commandValue == 4)
    {
     display.clear();
-    display.print("turn left");
+    display.print("turn");
+    display.gotoXY(0,1);
+    display.print("left");
     turn(-90);
    }
    else if(commandValue == 5)
    {
     display.clear();
-    display.print("turn right");
+    display.print("turn");
+    display.gotoXY(0,1);
+    display.print("right");
     turn(90);
    }
    //signs
@@ -203,6 +209,7 @@ void processCommand(unsigned commandValue)
    //traffic lights
    else if(commandValue == 10)//rood
    {
+    checkStoplicht = true;
     display.clear();
     display.print("stoplicht");
     display.gotoXY(0,1);
@@ -288,13 +295,21 @@ void loop() {
   }
   Serial.println("countLoops-");
   Serial.println(countLoops);
-  if(countLoops < 10)
+  if(countLoops < 10 and checkStoplicht == false)
   {
     processCommand(ReceivedValue);
   }
   else
   {
-    processCommand(0); 
+    if(checkStoplicht == true && ReceivedValue == 12)
+    {
+      checkStoplicht == false;
+      processCommand(ReceivedValue);
+    }
+    else
+    {
+      processCommand(0); 
+    }
   }
    
   //delay(50);
