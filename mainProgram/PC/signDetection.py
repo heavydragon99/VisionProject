@@ -12,7 +12,7 @@ import imutils
 min_size_components = 300
 similitary_contour_with_circle = 0.60
 
-model = load_model('traffic_classifier_7bordenv4.h5')
+model = load_model('traffic_classifier_7bordenv6.h5')
 
 # Dictionary to label all traffic signs class.
 classes = {
@@ -45,8 +45,8 @@ def classify(image):
     
     if confidence_percent > 95 and pred != 7:
         sign = classes[pred + 1]
-        #print("Detected sign is: " + str(sign))
-        #print("Percentage it is that bord: " + str(confidence_percent))
+        print("Detected sign is: " + str(sign))
+        print("Percentage it is that bord: " + str(confidence_percent))
     else:
         sign = classes[0]
     return sign

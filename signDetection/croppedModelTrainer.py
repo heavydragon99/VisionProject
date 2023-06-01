@@ -64,7 +64,7 @@ model.add(Dense(43, activation='softmax'))
 # Compilation of the model
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-eps = 30
+eps = 25
 anc = model.fit(X_t1, y_t1, batch_size=32, epochs=eps, validation_data=(X_t2, y_t2))
 
 model.save("my_model_custom.h5")
@@ -106,4 +106,4 @@ plt.show()
 # # Accuracy with the test data
 # print(accuracy_score(labels, pred))
 
-model.save('traffic_classifier_7bordenv4.h5')
+model.save('traffic_classifier_7bordenv6.h5')
