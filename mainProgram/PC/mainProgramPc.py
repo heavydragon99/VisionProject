@@ -4,8 +4,7 @@ import cv2
 import numpy as np
 import socket
 import time
-from signDetection import detectSign
-
+from signDetection import detectSign, classes
 
 #intersection variable
 intersectionBacklogIndex = 0
@@ -16,10 +15,10 @@ intersectionWait = False
 #bord detected
 LastSign = ""
 signBacklogIndex = 0
-signBacklog = np.full(10, '', dtype=object)
+signBacklog = np.full(3, '', dtype=object)
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.41'
+IP_ADDRESS = '192.168.137.156'
 PORT = 8080
 
 # Create socket object
@@ -85,10 +84,6 @@ while True:
 
     img = cv2.rotate(img, cv2.ROTATE_180)
     
-    
-    
-
-    #img = roadDetection.readImage('C:\\VisionProject\\Pictures\\HVGA\\Weg\\00044.jpg',cv2.ROTATE_180)
 
     #gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # temp
     
@@ -108,34 +103,50 @@ while True:
 
 
     #img = roadDetection.__cropImage(img,usableHeight,0,0,0)
-    currentSign = detectSign(file=img)
-    signBacklog[signBacklogIndex] = str(currentSign)
+    detectedSign = detectSign(file=img)
+    currentSign = ""
+    signBacklog[signBacklogIndex] = str(detectedSign)
     signBacklogIndex = (signBacklogIndex + 1) % len(signBacklog)
-    if(currentSign != "No Sign" and LastSign != currentSign):
-        print("sign" + currentSign)
-        cv2.waitKey(2000)
-        #send data
+    bordCountArray = [0,0,0,0,0,0,0,0]
+    for i in signBacklog:
+        for j in classes:
+            if i == classes[j]:
+                bordCountArray[j] += 1
+                break
+
+    currentSign = classes[bordCountArray.index(max(bordCountArray))]
+    #print("Current most detected sign is: " + currentSign)
+
+    if(LastSign != currentSign and currentSign != "No Sign"):
+        #send
+        print("Current most detected sign is: " + currentSign)
         if(currentSign == "50 (0)"):
             client_socket.sendall(b"9")
+            print("9")
         elif(currentSign == "Verboden auto (1)"):
             client_socket.sendall(b"8")
+            print("8")
         elif(currentSign == "stop (2)"):
             client_socket.sendall(b"6")
+            print("6")
         elif(currentSign == "Verboden in te rijden (3)"):
             client_socket.sendall(b"7")
+            print("7")
         elif(currentSign == "Stoplicht rood (4)"):
             client_socket.sendall(b"10")
+            print("10")
         elif(currentSign == "Stoplicht oranje (5)"):
             client_socket.sendall(b"11")
+            print("11")
         elif(currentSign == "Stoplicht groen (6)"):
-            client_socket.sendall(b"12")
-        LastSign = currentSign
+            client_socket.sendall(b"12")   
+            print("12")       
     else:
 
         correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight,imgVisual=img)
         intersection,length = roadDetection.checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth,imgVisual=img)
-        print("length: "+ str(length))
-        print("intersection: "+ str(intersection))   
+        #print("length: "+ str(length))
+        #print("intersection: "+ str(intersection))   
             
         #only for visualizing
         #edges = roadDetection.__cropImage(edges,usableHeight,0,0,0)
@@ -164,16 +175,16 @@ while True:
 
 
             if(intersectionWait == False and length > 55):
-                print(correction)
-                print("inter one time")
+                #print(correction)
+                #print("inter one time")
                 if(correction == None or correction == -999):
                     client_socket.sendall(b"0")
                 elif(correction < -50):
                     client_socket.sendall(b"185")
-                    print("inter one right")
+                    #print("inter one right")
                 elif(correction > -5):
                     client_socket.sendall(b"195")
-                    print("inter one left")
+                    #print("inter one left")
                 else:
                     client_socket.sendall(b"0")
 
@@ -201,7 +212,8 @@ while True:
                 intersectionFound = False
                 byte_string = b""
                 if(currentInter != "rightCorner" and currentInter != "leftCorner"):
-                    user_input = input("Enter direction: ")
+                    #user_input = input("Enter direction: ")
+                    user_input = "up"
                     byte_string = b"" + user_input.encode() + b"|" + str(InverseLength).encode()
                 elif(currentInter == "rightCorner"):
                     byte_string = b"right" + b"|" + str(InverseLength).encode()
@@ -242,7 +254,7 @@ while True:
                 client_socket.sendall(b"1")
                 #print("sending data for car")
     
-
+    LastSign = currentSign
     #if(correction != -999):
     
     

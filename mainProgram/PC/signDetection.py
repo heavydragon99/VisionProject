@@ -12,7 +12,7 @@ import imutils
 min_size_components = 300
 similitary_contour_with_circle = 0.60
 
-model = load_model("traffic_classifier_7bordenv3.h5")
+model = load_model('traffic_classifier_7bordenv4.h5')
 
 # Dictionary to label all traffic signs class.
 classes = {
@@ -42,10 +42,11 @@ def classify(image):
         0, pred
     ]  # Retrieve the predicted probability for the highest class
     confidence_percent = max_prob * 100  # Calculate the confidence percentage
-    print(confidence_percent)
-
-    if confidence_percent > 80:
+    
+    if confidence_percent > 95 and pred != 7:
         sign = classes[pred + 1]
+        #print("Detected sign is: " + str(sign))
+        #print("Percentage it is that bord: " + str(confidence_percent))
     else:
         sign = classes[0]
     return sign
@@ -194,7 +195,12 @@ def localization(image, min_size_components, similitary_contour_with_circle):
 
     binary_image = removeSmallComponents(binary_image, min_size_components)
 
-    cv2.imshow("Binary", binary_image)
+    height, width = binary_image.shape[:2]
+    roi_start = 0
+    roi_end = int(height / 4)  # Top quarter of the image   
+    binary_image[roi_start:roi_end, :] = 0
+
+    #cv2.imshow("Binary", binary_image)
     contours = findContour(binary_image)
     sign = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
 
@@ -227,7 +233,7 @@ def detectSign(file):
     if croppedSign is None:
         return classes[0]
     else:
-        cv2.imshow("Result", croppedSign)
+        #cv2.imshow("Result", croppedSign)
         signName = classify(croppedSign)
         return signName
 

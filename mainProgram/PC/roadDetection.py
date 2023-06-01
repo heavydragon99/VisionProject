@@ -131,7 +131,7 @@ def checkSides(middleOfScreen,edges,usableImageHeight,imgVisual):
             left = (lineXValues[0] + lineXValues[1]) /2
             middle = (left + lineXValues[2]) / 2
             correction = middleOfScreen - middle
-            print("coor:" + str(correction))
+            #print("coor:" + str(correction))
             return correction
         # 1l - 2r
         else:
