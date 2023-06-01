@@ -12,7 +12,7 @@ import imutils
 min_size_components = 300
 similitary_contour_with_circle = 0.60
 
-model = load_model("traffic_classifier_7bordenv3.h5")
+model = load_model('C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\mainProgram\\PC\\traffic_classifier_7bordenv3.h5')
 
 # Dictionary to label all traffic signs class.
 classes = {
@@ -42,10 +42,12 @@ def classify(image):
         0, pred
     ]  # Retrieve the predicted probability for the highest class
     confidence_percent = max_prob * 100  # Calculate the confidence percentage
-    print(confidence_percent)
+    
 
     if confidence_percent > 80:
         sign = classes[pred + 1]
+        print("Detected sign is: " + str(sign))
+        print("Percentage it is that bord: " + str(confidence_percent))
     else:
         sign = classes[0]
     return sign
@@ -193,6 +195,11 @@ def localization(image, min_size_components, similitary_contour_with_circle):
     binary_image = preprocess_image(image)
 
     binary_image = removeSmallComponents(binary_image, min_size_components)
+
+    height, width = binary_image.shape[:2]
+    roi_start = 0
+    roi_end = int(height / 4)  # Top quarter of the image   
+    binary_image[roi_start:roi_end, :] = 0
 
     cv2.imshow("Binary", binary_image)
     contours = findContour(binary_image)

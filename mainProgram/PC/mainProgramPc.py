@@ -30,7 +30,7 @@ signBacklogIndex = 0
 signBacklog = np.full(5, '', dtype=object)
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.41'
+IP_ADDRESS = '192.168.137.205'
 PORT = 8080
 
 # Create socket object
@@ -120,10 +120,11 @@ while True:
 
     #img = roadDetection.__cropImage(img,usableHeight,0,0,0)
     detectedSign = detectSign(file=img)
+    cv2.waitKey(2000)
     currentSign = ""
     signBacklog[signBacklogIndex] = str(detectedSign)
     signBacklogIndex = (signBacklogIndex + 1) % len(signBacklog)
-    bordCountArray = [0,0,0,0,0,0,0]
+    bordCountArray = [0,0,0,0,0,0,0,0]
     for i in signBacklog:
         for j in classes:
             if i == classes[j]:
@@ -155,8 +156,8 @@ while True:
 
         correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight,imgVisual=img)
         intersection,length = roadDetection.checkIntersections(edges=edges,usableImageHeight=usableHeight,imageWidth=imageWidth,imgVisual=img)
-        print("length: "+ str(length))
-        print("intersection: "+ str(intersection))   
+        #print("length: "+ str(length))
+        #print("intersection: "+ str(intersection))   
             
         #only for visualizing
         #edges = roadDetection.__cropImage(edges,usableHeight,0,0,0)
@@ -185,16 +186,16 @@ while True:
 
 
             if(intersectionWait == False and length > 55):
-                print(correction)
-                print("inter one time")
+                #print(correction)
+                #print("inter one time")
                 if(correction == None or correction == -999):
                     client_socket.sendall(b"0")
                 elif(correction < -50):
                     client_socket.sendall(b"185")
-                    print("inter one right")
+                    #print("inter one right")
                 elif(correction > -5):
                     client_socket.sendall(b"195")
-                    print("inter one left")
+                    #print("inter one left")
                 else:
                     client_socket.sendall(b"0")
 
