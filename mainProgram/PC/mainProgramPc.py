@@ -30,7 +30,7 @@ signBacklogIndex = 0
 signBacklog = np.full(5, '', dtype=object)
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.205'
+IP_ADDRESS = '192.168.137.54'
 PORT = 8080
 
 # Create socket object
@@ -120,7 +120,6 @@ while True:
 
     #img = roadDetection.__cropImage(img,usableHeight,0,0,0)
     detectedSign = detectSign(file=img)
-    cv2.waitKey(2000)
     currentSign = ""
     signBacklog[signBacklogIndex] = str(detectedSign)
     signBacklogIndex = (signBacklogIndex + 1) % len(signBacklog)
@@ -133,9 +132,8 @@ while True:
 
     currentSign = classes[bordCountArray.index(max(bordCountArray))]
     
-    if(currentSign != "No Sign" and LastSign != currentSign):
+    if(LastSign != currentSign):
         print("sign" + currentSign)
-        cv2.waitKey(2000)
         #send data
         if(currentSign == "50 (0)"):
             client_socket.sendall(b"9")
@@ -223,7 +221,8 @@ while True:
                 intersectionFound = False
                 byte_string = b""
                 if(currentInter != "rightCorner" and currentInter != "leftCorner"):
-                    user_input = input("Enter direction: ")
+                    #user_input = input("Enter direction: ")
+                    user_input = "up"
                     byte_string = b"" + user_input.encode() + b"|" + str(InverseLength).encode()
                 elif(currentInter == "rightCorner"):
                     byte_string = b"right" + b"|" + str(InverseLength).encode()
