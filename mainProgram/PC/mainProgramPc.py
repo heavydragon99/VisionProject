@@ -18,7 +18,7 @@ signBacklogIndex = 0
 signBacklog = np.full(3, '', dtype=object)
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.149'
+IP_ADDRESS = '192.168.137.156'
 PORT = 8080
 
 # Create socket object
@@ -50,15 +50,15 @@ while True:
 
     # Receive image size from server
 
-    # while(1):
-    #     try:
-    #         # Attempt a small operation on the socket
-    #         client_socket.getpeername()
-    #         #print("Socket is still open.")
-    #         break
-    #     except socket.error:
-    #         #print("Socket is closed.")
-    #         client_socket.connect((IP_ADDRESS, PORT))
+    while(1):
+        try:
+            # Attempt a small operation on the socket
+            client_socket.getpeername()
+            #print("Socket is still open.")
+            break
+        except socket.error:
+            #print("Socket is closed.")
+            client_socket.connect((IP_ADDRESS, PORT))
     
     img_size_str = client_socket.recv(16)
     decoded_string = img_size_str.decode('utf-8', 'ignore')
@@ -84,10 +84,6 @@ while True:
 
     img = cv2.rotate(img, cv2.ROTATE_180)
     
-    
-    
-
-    #img = roadDetection.readImage('C:\\VisionProject\\Pictures\\HVGA\\Weg\\00044.jpg',cv2.ROTATE_180)
 
     #gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # temp
     
