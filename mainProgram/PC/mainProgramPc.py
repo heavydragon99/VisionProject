@@ -4,19 +4,7 @@ import cv2
 import numpy as np
 import socket
 import time
-from signDetection import detectSign
-
-# Dictionary to label all traffic signs class.
-classes = {
-    0: "No Sign",
-    1: "50 (0)",
-    2: "Verboden auto (1)",
-    3: "stop (2)",
-    4: "Verboden in te rijden (3)",
-    5: "Stoplicht rood (4)",
-    6: "Stoplicht oranje (5)",
-    7: "Stoplicht groen (6)",
-}
+from signDetection import detectSign, classes
 
 #intersection variable
 intersectionBacklogIndex = 0
@@ -27,10 +15,10 @@ intersectionWait = False
 #bord detected
 LastSign = ""
 signBacklogIndex = 0
-signBacklog = np.full(5, '', dtype=object)
+signBacklog = np.full(3, '', dtype=object)
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.54'
+IP_ADDRESS = '192.168.137.149'
 PORT = 8080
 
 # Create socket object
@@ -62,15 +50,15 @@ while True:
 
     # Receive image size from server
 
-    while(1):
-        try:
-            # Attempt a small operation on the socket
-            client_socket.getpeername()
-            #print("Socket is still open.")
-            break
-        except socket.error:
-            #print("Socket is closed.")
-            client_socket.connect((IP_ADDRESS, PORT))
+    # while(1):
+    #     try:
+    #         # Attempt a small operation on the socket
+    #         client_socket.getpeername()
+    #         #print("Socket is still open.")
+    #         break
+    #     except socket.error:
+    #         #print("Socket is closed.")
+    #         client_socket.connect((IP_ADDRESS, PORT))
     
     img_size_str = client_socket.recv(16)
     decoded_string = img_size_str.decode('utf-8', 'ignore')
@@ -131,25 +119,32 @@ while True:
                 break
 
     currentSign = classes[bordCountArray.index(max(bordCountArray))]
-    
-    if(LastSign != currentSign):
-        print("sign" + currentSign)
-        #send data
+    #print("Current most detected sign is: " + currentSign)
+
+    if(LastSign != currentSign and currentSign != "No Sign"):
+        #send
+        print("Current most detected sign is: " + currentSign)
         if(currentSign == "50 (0)"):
             client_socket.sendall(b"9")
+            print("9")
         elif(currentSign == "Verboden auto (1)"):
             client_socket.sendall(b"8")
+            print("8")
         elif(currentSign == "stop (2)"):
             client_socket.sendall(b"6")
+            print("6")
         elif(currentSign == "Verboden in te rijden (3)"):
             client_socket.sendall(b"7")
+            print("7")
         elif(currentSign == "Stoplicht rood (4)"):
             client_socket.sendall(b"10")
+            print("10")
         elif(currentSign == "Stoplicht oranje (5)"):
             client_socket.sendall(b"11")
+            print("11")
         elif(currentSign == "Stoplicht groen (6)"):
-            client_socket.sendall(b"12")
-        LastSign = currentSign
+            client_socket.sendall(b"12")   
+            print("12")       
     else:
 
         correction = roadDetection.checkSides(middleOfScreen=(imageWidth/2),edges=edges,usableImageHeight=usableHeight,imgVisual=img)
@@ -263,7 +258,7 @@ while True:
                 client_socket.sendall(b"1")
                 #print("sending data for car")
     
-
+    LastSign = currentSign
     #if(correction != -999):
     
     

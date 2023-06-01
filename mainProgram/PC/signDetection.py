@@ -43,7 +43,6 @@ def classify(image):
     ]  # Retrieve the predicted probability for the highest class
     confidence_percent = max_prob * 100  # Calculate the confidence percentage
     
-    cv2.waitKey(2000)
     if confidence_percent > 95 and pred != 7:
         sign = classes[pred + 1]
         #print("Detected sign is: " + str(sign))
@@ -201,7 +200,7 @@ def localization(image, min_size_components, similitary_contour_with_circle):
     roi_end = int(height / 4)  # Top quarter of the image   
     binary_image[roi_start:roi_end, :] = 0
 
-    cv2.imshow("Binary", binary_image)
+    #cv2.imshow("Binary", binary_image)
     contours = findContour(binary_image)
     sign = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
 
@@ -234,7 +233,7 @@ def detectSign(file):
     if croppedSign is None:
         return classes[0]
     else:
-        cv2.imshow("Result", croppedSign)
+        #cv2.imshow("Result", croppedSign)
         signName = classify(croppedSign)
         return signName
 
