@@ -19,7 +19,7 @@ signBacklogIndex = 0
 signBacklog = np.full(10, '', dtype=object)
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.41'
+IP_ADDRESS = '192.168.137.205'
 PORT = 8080
 
 # Create socket object
@@ -108,9 +108,10 @@ while True:
 
 
     #img = roadDetection.__cropImage(img,usableHeight,0,0,0)
-    currentSign = detectSign(file=img)
-    signBacklog[signBacklogIndex] = str(currentSign)
-    signBacklogIndex = (signBacklogIndex + 1) % len(signBacklog)
+    #currentSign = detectSign(file=img)
+    #signBacklog[signBacklogIndex] = str(currentSign)
+    #signBacklogIndex = (signBacklogIndex + 1) % len(signBacklog)
+    currentSign = "No Sign"
     if(currentSign != "No Sign" and LastSign != currentSign):
         print("sign" + currentSign)
         cv2.waitKey(2000)
@@ -158,8 +159,9 @@ while True:
             for i in range(0, len(intersectionBacklog)):
                 if(intersectionBacklog[i] != "no intersection" and intersectionBacklog[i] != "Error could not indentify intersection/corner" and intersectionBacklog[i] != ""):
                     CountInter +=1
-            if(CountInter > 5):
-                #print("intersectionFound!!!")
+            if(CountInter > 2):
+                print(CountInter)
+                print("intersectionFound!!!")
                 intersectionFound = True
 
 

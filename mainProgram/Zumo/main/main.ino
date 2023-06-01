@@ -269,7 +269,7 @@ void loop() {
   {
     Serial.println("receive");
     receiveByte();
-    if(motorValue != 255)
+    if(motorValue != 255 and motorValue != 224)
     {
       ReceivedValue = motorValue;
     }
