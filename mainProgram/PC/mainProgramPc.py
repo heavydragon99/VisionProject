@@ -15,7 +15,8 @@ intersectionWait = False
 
 #bord detected
 LastSign = ""
-
+signBacklogIndex = 0
+signBacklog = np.full(10, '', dtype=object)
 
 # IP address and port of the socket server
 IP_ADDRESS = '192.168.137.41'
@@ -107,8 +108,9 @@ while True:
 
 
     #img = roadDetection.__cropImage(img,usableHeight,0,0,0)
-    #currentSign = detectSign(file=img)
-    currentSign = "No Sign"
+    currentSign = detectSign(file=img)
+    signBacklog[signBacklogIndex] = str(currentSign)
+    signBacklogIndex = (signBacklogIndex + 1) % len(signBacklog)
     if(currentSign != "No Sign" and LastSign != currentSign):
         print("sign" + currentSign)
         cv2.waitKey(2000)
