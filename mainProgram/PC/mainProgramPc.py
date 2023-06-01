@@ -6,6 +6,17 @@ import socket
 import time
 from signDetection import detectSign
 
+# Dictionary to label all traffic signs class.
+classes = {
+    0: "No Sign",
+    1: "50 (0)",
+    2: "Verboden auto (1)",
+    3: "stop (2)",
+    4: "Verboden in te rijden (3)",
+    5: "Stoplicht rood (4)",
+    6: "Stoplicht oranje (5)",
+    7: "Stoplicht groen (6)",
+}
 
 #intersection variable
 intersectionBacklogIndex = 0
@@ -16,7 +27,7 @@ intersectionWait = False
 #bord detected
 LastSign = ""
 signBacklogIndex = 0
-signBacklog = np.full(10, '', dtype=object)
+signBacklog = np.full(5, '', dtype=object)
 
 # IP address and port of the socket server
 IP_ADDRESS = '192.168.137.41'
@@ -108,9 +119,19 @@ while True:
 
 
     #img = roadDetection.__cropImage(img,usableHeight,0,0,0)
-    currentSign = detectSign(file=img)
-    signBacklog[signBacklogIndex] = str(currentSign)
+    detectedSign = detectSign(file=img)
+    currentSign = ""
+    signBacklog[signBacklogIndex] = str(detectedSign)
     signBacklogIndex = (signBacklogIndex + 1) % len(signBacklog)
+    bordCountArray = [0,0,0,0,0,0,0]
+    for i in signBacklog:
+        for j in classes:
+            if i == classes[j]:
+                bordCountArray[j] += 1
+                break
+
+    currentSign = classes[bordCountArray.index(max(bordCountArray))]
+    
     if(currentSign != "No Sign" and LastSign != currentSign):
         print("sign" + currentSign)
         cv2.waitKey(2000)
