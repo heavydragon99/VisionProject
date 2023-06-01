@@ -135,7 +135,7 @@ int receiveByte()
 
 void processCommand(unsigned commandValue)
 {
-   display.clear();
+   
    Serial.println("--commandValue--");
    Serial.println(commandValue);
    //normal driving
@@ -158,23 +158,27 @@ void processCommand(unsigned commandValue)
    //intersection handeling
    else if(commandValue == 4)
    {
+    display.clear();
     display.print("turn left");
     turn(-90);
    }
    else if(commandValue == 5)
    {
+    display.clear();
     display.print("turn right");
     turn(90);
    }
    //signs
    else if(commandValue == 6)//stop bord
    {
-    display.print("Stop bord");
+    display.clear();
+    display.print("Stopbord");
     motors.setSpeeds(0, 0);
     delay(3000);
    }
    else if(commandValue == 7)//verboden in rijden
    {
+    display.clear();
     display.print("verboden");
     display.gotoXY(0,1);
     display.print("rijden");
@@ -183,6 +187,7 @@ void processCommand(unsigned commandValue)
    }
    else if(commandValue == 8)//verboden auto
    {
+    display.clear();
     display.print("verboden");
     display.gotoXY(0,1);
     display.print("auto");
@@ -191,19 +196,23 @@ void processCommand(unsigned commandValue)
    }
    else if(commandValue == 9)//50 bord
    {
-    display.print("50");
-    motors.setSpeeds(200, 200);
+    display.clear();
+    display.print("bord 50");
+    motors.setSpeeds(50, 50);
    }
    //traffic lights
    else if(commandValue == 10)//rood
    {
+    display.clear();
     display.print("stoplicht");
     display.gotoXY(0,1);
     display.print("rood");
     motors.setSpeeds(0, 0);
+    delay(3000);
    }
    else if(commandValue == 11)//geel
    {
+    display.clear();
     display.print("stoplicht");
     display.gotoXY(0,1);
     display.print("geel");
@@ -211,6 +220,7 @@ void processCommand(unsigned commandValue)
    }
    else if(commandValue == 12)//groen
    {
+    display.clear();
     display.print("stoplicht");
     display.gotoXY(0,1);
     display.print("groen");
@@ -233,11 +243,12 @@ void processCommand(unsigned commandValue)
    
    else if(commandValue > 200 && commandValue <= 255)
    {
+    display.clear();
     display.print("intersection");
     display.gotoXY(0,1);
     display.print((commandValue-200));
     int count = commandValue -200;
-    count = count*50;
+    count = count*55;
     drive(count);
    }
 }
@@ -260,8 +271,8 @@ void setup() {
 }
 
 void loop() {
-  display.clear();
-  display.print("Running");
+//  display.clear();
+//  display.print("Running");
   requestData();
   bool checkStart = waitForStart();
 

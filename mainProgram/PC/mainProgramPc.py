@@ -19,7 +19,7 @@ signBacklogIndex = 0
 signBacklog = np.full(10, '', dtype=object)
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.205'
+IP_ADDRESS = '192.168.137.207'
 PORT = 8080
 
 # Create socket object
@@ -153,7 +153,7 @@ while True:
         noAction = False
         #print(correction)
 
-        if(intersection != "no intersection"):
+        if(intersection != "no intersection" or intersectionWait == True):
 
             CountInter = 0
             for i in range(0, len(intersectionBacklog)):
@@ -165,15 +165,15 @@ while True:
                 intersectionFound = True
 
 
-            if(intersectionWait == False and length > 55):
+            if(intersectionWait == False and length > 50):
                 print(correction)
                 print("inter one time")
                 if(correction == None or correction == -999):
                     client_socket.sendall(b"0")
-                elif(correction < -50):
+                elif(correction < -40):
                     client_socket.sendall(b"185")
                     print("inter one right")
-                elif(correction > -5):
+                elif(correction > -15):
                     client_socket.sendall(b"195")
                     print("inter one left")
                 else:
@@ -183,18 +183,33 @@ while True:
                 #client_socket.sendall(b"0")
                 noAction = True
                 intersectionWait = True
-        
-            elif(intersectionFound == True and length > 55):
-                for i in range(0,len(intersectionBacklog)-1):
-                    index = 0
-                    if(intersectionBacklogIndex - i -1 < 0):
-                        index = len(intersectionBacklog)-1 + intersectionBacklogIndex - i
-                    else:
-                        index = intersectionBacklogIndex - i
+            
+            elif(intersectionWait == True):
+                print("intersectionWait" + str(intersectionWait))
+                last_added_index = (intersectionBacklogIndex - 1) % len(intersectionBacklog)
+                last_added_value = intersectionBacklog[last_added_index]
+                previous_value = ""
 
-                    if(intersectionBacklog[index] != "no intersection" and intersectionBacklog[index] != "Error could not indentify intersection/corner" and intersectionBacklog[index] != ""):
-                        currentInter = intersectionBacklog[index]
-                        break
+                while last_added_value in ["no intersection", "Error could not identify intersection/corner", ""] or previous_value in ["no intersection", "Error could not identify intersection/corner", ""]:
+                    previous_value = last_added_value
+                    last_added_index = (last_added_index - 1) % len(intersectionBacklog)
+                    last_added_value = intersectionBacklog[last_added_index]
+
+                print("last_added_value" + str(last_added_value))
+                currentInter = last_added_value
+                # for i in range(0,len(intersectionBacklog)-1):
+                #     index = 0
+                #     if(intersectionBacklogIndex - i -1 < 0):
+                #         index = len(intersectionBacklog)-1 + intersectionBacklogIndex - i
+                #     else:
+                #         index = intersectionBacklogIndex - i
+
+                #     if(intersectionBacklog[index] != "no intersection" and intersectionBacklog[index] != "Error could not indentify intersection/corner" and intersectionBacklog[index] != ""):
+                #         currentInter = intersectionBacklog[index]
+                #         break
+
+
+
                 intersectionBacklog = np.full(10, '', dtype=object)
 
                 
@@ -212,7 +227,7 @@ while True:
                 client_socket.sendall(byte_string)
                 noAction = True
                 intersectionWait = False
-            elif(intersectionFound == False and length > 55):
+            elif(intersectionFound == False and length > 50):
                 client_socket.sendall(b"0")
                 noAction = True
 
@@ -231,11 +246,11 @@ while True:
                 #print("error")
                 client_socket.sendall(b"0")
                 #print("sending data for car")
-            elif(correction < -50):
+            elif(correction < -55):
                 #print("right")
                 client_socket.sendall(b"3")
                 #print("sending data for car")
-            elif(correction > -5):
+            elif(correction > 0):
                 #print("left")
                 client_socket.sendall(b"2")
                 #print("sending data for car")
