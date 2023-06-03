@@ -19,17 +19,16 @@ signBacklogIndex = 0
 signBacklog = np.full(3, '', dtype=object)
 
 # Wi-Fi variable
-IP_ADDRESS = '192.168.137.66'
+IP_ADDRESS = '192.168.137.201'
 PORT = 8080
 Connected = True
 
 
-
+cv2.waitKey()
 
 
 
 def wifiMessage(messageSelect,data=None,size=0):
-    print("wifi")
     connectionStatus = False
     dataReturn = None
     try:
@@ -37,6 +36,7 @@ def wifiMessage(messageSelect,data=None,size=0):
         if(messageSelect == 0):
             client_socket.getpeername()
         elif(messageSelect == 1):
+            print("sendata" + str(data))
             client_socket.sendall(data)
         elif(messageSelect == 2):
             
@@ -63,12 +63,13 @@ while True:
     try:
         print("waiting")
         client_socket.connect((IP_ADDRESS, PORT))
-        client_socket.settimeout(1000)
+        client_socket.settimeout(10)
     except OSError:
         print("could not connected")
         client_socket.close 
         connectionStatus = False
         time.sleep(1)
+    client_socket.settimeout(10)
     Connected = wifiMessage(messageSelect=0)
     print("Connected1" + str(Connected))
     Connected = wifiMessage(messageSelect=1,data=b"ready")
@@ -109,7 +110,7 @@ while True:
         print("main loop sizeok")
         if(not Connected):
             break
-
+        print("main loop before img")
         # Receive image data from server
         img_buf = b''
         while len(img_buf) < img_size:
@@ -127,7 +128,7 @@ while True:
             break
         # Convert image buffer to numpy array
         img_arr = np.frombuffer(img_buf, dtype=np.uint8)
-
+        print("main loop after img")
         # Decode image data to OpenCV Mat object
         try:
             img = cv2.imdecode(img_arr, cv2.IMREAD_GRAYSCALE)
