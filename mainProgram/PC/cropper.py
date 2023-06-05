@@ -1,3 +1,17 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import cv2
+import tensorflow as tf
+from PIL import Image
+import os
+from sklearn.model_selection import train_test_split
+from keras.utils import to_categorical
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPool2D, Dense, Flatten, Dropout
+from PIL import Image
+import glob
+
 # Load the trained model to classify sign
 from keras.models import load_model
 import cv2
@@ -9,10 +23,11 @@ from math import sqrt
 # from skimage.feature import blob_dog, blob_log, blob_doh
 import imutils
 
-min_size_components = 300
-similitary_contour_with_circle = 0.60
+min_size_components = 2500
 
-model = load_model("traffic_classifier_7bordenv8.h5")
+similitary_contour_with_circle = 0.6
+
+# model = load_model("traffic_classifier_7bordenv7.h5")
 
 # Dictionary to label all traffic signs class.
 classes = {
@@ -62,7 +77,7 @@ def contrastLimit(image):
 
 
 def LaplacianOfGaussian(image):
-    LoG_image = cv2.GaussianBlur(image, (5, 5), 0)  # paramter
+    LoG_image = cv2.GaussianBlur(image, (7, 7), 0)  # paramter
     gray = LoG_image
     LoG_image = cv2.Laplacian(gray, cv2.CV_8U, 3, 3, 2)  # parameter
     LoG_image = cv2.convertScaleAbs(LoG_image)
@@ -70,7 +85,7 @@ def LaplacianOfGaussian(image):
 
 
 def binarization(image):
-    thresh = cv2.threshold(image, 45, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(image, 15, 255, cv2.THRESH_BINARY)[1]  # 45
     # thresh = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
     return thresh
 
@@ -206,11 +221,6 @@ def localization(image, min_size_components, similitary_contour_with_circle):
     cv2.imshow("Binary", binary_image)
     if sign is not None:
         cv2.imshow("Cropped", sign)
-        height, width = sign.shape[:2]
-        print("Height is:" + str(height) + " Width is: " + str(width))
-        cv2.waitKey(1)
-        if height < 40 or width > 80:
-            return None
     return sign
 
 
@@ -247,3 +257,23 @@ def detectSign(file):
 
 # file = cv2.imread("..\\Pictures\\HVGA\\STOP\\00016.jpg")
 # name = detectSign(file)
+
+
+image_list = []
+for filename in glob.glob(
+    "D:\\Github\\VisionProject\\Pictures\\Train\\2\\*.jpg"
+):  # assuming gif
+    im = Image.open(filename)
+    im = np.array(im)
+    im = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY)
+    image_list.append(im)
+
+
+counter = 0
+for i in image_list:
+    croppedSign = localization(i, min_size_components, similitary_contour_with_circle)
+    if croppedSign is not None:
+        name = str(counter) + ".jpg"
+        croppedSign = cv2.cvtColor(croppedSign, cv2.COLOR_GRAY2RGB)
+        cv2.imwrite(name, croppedSign)
+        counter += 1

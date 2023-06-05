@@ -1,4 +1,4 @@
-#Gestolen van https://www.analyticsvidhya.com/blog/2021/12/traffic-signs-recognition-using-cnn-and-keras-in-python/
+# Gestolen van https://www.analyticsvidhya.com/blog/2021/12/traffic-signs-recognition-using-cnn-and-keras-in-python/
 
 import numpy as np
 import pandas as pd
@@ -19,13 +19,13 @@ cur_path = os.getcwd()
 
 # Retrieving the images and their labels
 for i in range(classes):
-    #path = os.path.join(cur_path, 'train', str(i))
-    path = os.path.join('C:\\Users\\siemv\\OneDrive\\Documenten\\GitHub\\VisionProject\\Pictures\\Train', str(i))
+    # path = os.path.join(cur_path, 'train', str(i))
+    path = os.path.join("D:\\Github\\VisionProject\\Pictures\\Train", str(i))
     images = os.listdir(path)
     for a in images:
         try:
-            image = Image.open(path + '/' + a)  # Fix string concatenation
-            #image = Image.open(path + '/' + a).convert('L')
+            image = Image.open(path + "/" + a)  # Fix string concatenation
+            # image = Image.open(path + '/' + a).convert('L')
             image = image.resize((30, 30))
             image = np.array(image)
             data.append(image)
@@ -48,21 +48,25 @@ y_t2 = to_categorical(y_t2, 43)
 
 # Building the model
 model = Sequential()
-model.add(Conv2D(filters=32, kernel_size=(5, 5), activation='relu', input_shape=X_t1.shape[1:]))
-model.add(Conv2D(filters=32, kernel_size=(5, 5), activation='relu'))
+model.add(
+    Conv2D(
+        filters=32, kernel_size=(5, 5), activation="relu", input_shape=X_t1.shape[1:]
+    )
+)
+model.add(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"))
 model.add(MaxPool2D(pool_size=(2, 2)))
 model.add(Dropout(rate=0.25))
-model.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu'))
-model.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu'))
+model.add(Conv2D(filters=64, kernel_size=(3, 3), activation="relu"))
+model.add(Conv2D(filters=64, kernel_size=(3, 3), activation="relu"))
 model.add(MaxPool2D(pool_size=(2, 2)))
 model.add(Dropout(rate=0.25))
 model.add(Flatten())
-model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation="relu"))
 model.add(Dropout(rate=0.5))
-model.add(Dense(43, activation='softmax'))
+model.add(Dense(43, activation="softmax"))
 
 # Compilation of the model
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
 eps = 25
 anc = model.fit(X_t1, y_t1, batch_size=32, epochs=eps, validation_data=(X_t2, y_t2))
@@ -71,20 +75,20 @@ model.save("my_model_custom.h5")
 
 # Plotting graphs for accuracy
 plt.figure(0)
-plt.plot(anc.history['accuracy'], label='training accuracy')
-plt.plot(anc.history['val_accuracy'], label='val accuracy')
-plt.title('Accuracy')
-plt.xlabel('epochs')
-plt.ylabel('accuracy')
+plt.plot(anc.history["accuracy"], label="training accuracy")
+plt.plot(anc.history["val_accuracy"], label="val accuracy")
+plt.title("Accuracy")
+plt.xlabel("epochs")
+plt.ylabel("accuracy")
 plt.legend()
 plt.show()
 
 plt.figure(1)
-plt.plot(anc.history['loss'], label='training loss')
-plt.plot(anc.history['val_loss'], label='val loss')
-plt.title('Loss')
-plt.xlabel('epochs')
-plt.ylabel('loss')
+plt.plot(anc.history["loss"], label="training loss")
+plt.plot(anc.history["val_loss"], label="val loss")
+plt.title("Loss")
+plt.xlabel("epochs")
+plt.ylabel("loss")
 plt.legend()
 plt.show()
 
@@ -106,4 +110,4 @@ plt.show()
 # # Accuracy with the test data
 # print(accuracy_score(labels, pred))
 
-model.save('traffic_classifier_7bordenv6.h5')
+model.save("traffic_classifier_7bordenv8.h5")
