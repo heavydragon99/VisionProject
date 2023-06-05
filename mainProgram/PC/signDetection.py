@@ -12,7 +12,7 @@ import imutils
 min_size_components = 300
 similitary_contour_with_circle = 0.60
 
-model = load_model("traffic_classifier_7bordenv7.h5")
+model = load_model("traffic_classifier_7bordenv8.h5")
 
 # Dictionary to label all traffic signs class.
 classes = {
