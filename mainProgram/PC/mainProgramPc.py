@@ -18,7 +18,7 @@ signBacklogIndex = 0
 signBacklog = np.full(3, '', dtype=object)
 
 # IP address and port of the socket server
-IP_ADDRESS = '192.168.137.147'
+IP_ADDRESS = '192.168.137.15'
 PORT = 8080
 
 # Create socket object
