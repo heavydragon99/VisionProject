@@ -1,5 +1,3 @@
-# Gestolen van https://www.analyticsvidhya.com/blog/2021/12/traffic-signs-recognition-using-cnn-and-keras-in-python/
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -110,4 +108,4 @@ plt.show()
 # # Accuracy with the test data
 # print(accuracy_score(labels, pred))
 
-model.save("traffic_classifier_7bordenv7.h5")
+model.save("traffic_classifier_7bordenv8.h5")
