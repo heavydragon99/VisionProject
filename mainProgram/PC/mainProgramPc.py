@@ -19,7 +19,7 @@ signBacklogIndex = 0
 signBacklog = np.full(3, '', dtype=object)
 
 # Wi-Fi variable
-IP_ADDRESS = '192.168.137.201'
+IP_ADDRESS = '192.168.137.241'
 PORT = 8080
 Connected = True
 
@@ -36,7 +36,7 @@ def wifiMessage(messageSelect,data=None,size=0):
         if(messageSelect == 0):
             client_socket.getpeername()
         elif(messageSelect == 1):
-            print("sendata" + str(data))
+            #print("sendata" + str(data))
             client_socket.sendall(data)
         elif(messageSelect == 2):
             
@@ -58,7 +58,7 @@ def wifiMessage(messageSelect,data=None,size=0):
 while True:
      # Create socket object
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print("init")
+    #print("init")
     # Connect to server
     try:
         print("waiting")
@@ -71,46 +71,46 @@ while True:
         time.sleep(1)
     client_socket.settimeout(10)
     Connected = wifiMessage(messageSelect=0)
-    print("Connected1" + str(Connected))
+    #print("Connected1" + str(Connected))
     Connected = wifiMessage(messageSelect=1,data=b"ready")
-    print("Connected2" + str(Connected))
+    #print("Connected2" + str(Connected))
     Connected,response = wifiMessage(messageSelect=2,size=16)   
-    print("Connected3" + str(Connected)) 
-    print("response " + str(response))
+    #print("Connected3" + str(Connected)) 
+    #print("response " + str(response))
     if(response != b'ready' and Connected == True):
-        print("int not ready")
+        #print("int not ready")
         client_socket.close
         Connected = False
-    print("main loop")
+    #print("main loop")
     while Connected:
         Connected = wifiMessage(1,b"next")
-        print("main loop next")
+        #print("main loop next")
         if(not Connected):
             break
 
         # Receive image size from server        
         #img_size_str = client_socket.recv(16)
         Connected,img_size_str = wifiMessage(2,"",16)
-        print("main loop receive size")
+        #print("main loop receive size")
         if(not Connected):
             break
 
 
         decoded_string = img_size_str.decode('utf-8', 'ignore')
-        print("main loop decode")
+        #print("main loop decode")
         substring = decoded_string[:5]
-        print("main loop decode 2")
+        #print("main loop decode 2")
         if(substring == ""):
             Connected = False
             break
-        print("main loop decode 3")
+        #print("main loop decode 3")
         img_size = int(substring)
         #print("img_size" + str(img_size))
         Connected = wifiMessage(1,b"sizeok")
-        print("main loop sizeok")
+        #print("main loop sizeok")
         if(not Connected):
             break
-        print("main loop before img")
+        #print("main loop before img")
         # Receive image data from server
         img_buf = b''
         while len(img_buf) < img_size:
@@ -128,7 +128,7 @@ while True:
             break
         # Convert image buffer to numpy array
         img_arr = np.frombuffer(img_buf, dtype=np.uint8)
-        print("main loop after img")
+        #print("main loop after img")
         # Decode image data to OpenCV Mat object
         try:
             img = cv2.imdecode(img_arr, cv2.IMREAD_GRAYSCALE)
@@ -299,7 +299,7 @@ while True:
                     intersectionBacklog = np.full(10, '', dtype=object)
 
                     
-                    #print("currentInter " + str(currentInter))
+                    print("current Intersection: " + str(currentInter))
                     InverseLength = usableHeight-length
                     intersectionFound = False
                     byte_string = b""
@@ -362,6 +362,6 @@ while True:
         
         LastSign = currentSign
         #if(correction != -999):
-        print("end main loop")
+        #print("end main loop")
         
         

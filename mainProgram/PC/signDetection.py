@@ -203,9 +203,9 @@ def localization(image, min_size_components, similitary_contour_with_circle):
     contours = findContour(binary_image)
     sign = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
 
-    cv2.imshow("Binary", binary_image)
+    #cv2.imshow("Binary", binary_image)
     if sign is not None:
-        cv2.imshow("Cropped", sign)
+        #cv2.imshow("Cropped", sign)
         height, width = sign.shape[:2]
         print("Height is:" + str(height) + " Width is: " + str(width))
         cv2.waitKey(1)

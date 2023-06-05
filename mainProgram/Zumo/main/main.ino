@@ -188,8 +188,8 @@ void processCommand(unsigned commandValue)
     display.print("verboden");
     display.gotoXY(0,1);
     display.print("rijden");
-    drive(1000);
-    turn(180);
+    drive(2000);
+    turn(172);
    }
    else if(commandValue == 8)//verboden auto
    {
@@ -197,8 +197,8 @@ void processCommand(unsigned commandValue)
     display.print("verboden");
     display.gotoXY(0,1);
     display.print("auto");
-    drive(1000);
-    turn(-180);
+    drive(2000);
+    turn(-172);
    }
    else if(commandValue == 9)//50 bord
    {
@@ -297,7 +297,7 @@ void loop() {
 //  Serial.println(countLoops);
 //  Serial.println("ReceivedValue-");
 //  Serial.println(ReceivedValue);
-  if(countLoops < 10 and checkStoplicht == false)
+  if(countLoops < 8 and checkStoplicht == false)
   {
     Serial.println("hierin1");
       Serial.println(ReceivedValue);

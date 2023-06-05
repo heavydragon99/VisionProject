@@ -129,10 +129,13 @@ def sendImageRecieveCommand():
                         int_value = int(rounded_value)
                         int_length = int_value-60
                         sendLength = int_length + 200
+                        if(sendLength >= 255):
+                            sendLength = 254
                     else:
                         direction = str(response)
                     #todo intersection handeling
                     if(direction == "left"):
+                        print("left")
                         print("amount:" + str(amount))
                         uartSendData(sendLength)
                         pyb.delay(1000)
@@ -140,6 +143,7 @@ def sendImageRecieveCommand():
                         uartSendData(0)
                         print("end left")
                     elif(direction == "right"):
+                        print("right")
                         print("amount:" + str(amount))
                         uartSendData(sendLength)
                         pyb.delay(1000)
@@ -147,6 +151,7 @@ def sendImageRecieveCommand():
                         uartSendData(0)
                         print("end right")
                     elif(direction == "up"):
+                        print("up")
                         print("amount:" + str(amount))
                         uartSendData(sendLength)
                         pyb.delay(1000)
@@ -154,6 +159,7 @@ def sendImageRecieveCommand():
                         print("end up")
 
                     else:
+                        print("normal")
                         uartSendData(int(response))
                 else:
                     print("Error: ", e)
