@@ -109,7 +109,7 @@ bool waitForStart()
   while (digitalRead(fromNicla) == 1) {
     if(timeout == 10000)
     {
-      Serial.println("timeout");
+      //Serial.println("timeout");
       return false;
     }
     ledRed(digitalRead(fromNicla));
@@ -138,8 +138,8 @@ int receiveByte()
 void processCommand(unsigned commandValue)
 {
    
-   Serial.println("--commandValue--");
-   Serial.println(commandValue);
+//   Serial.println("--commandValue--");
+//   Serial.println(commandValue);
    //normal driving
    if(commandValue == 0)
    {
@@ -285,7 +285,7 @@ void loop() {
 
   if(checkStart)
   {
-    Serial.println("receive");
+    //Serial.println("receive");
     receiveByte();
     if(motorValue != 255 and motorValue != 224)
     {
@@ -293,17 +293,23 @@ void loop() {
     }
     countLoops = 0;
   }
-  Serial.println("countLoops-");
-  Serial.println(countLoops);
+//  Serial.println("countLoops-");
+//  Serial.println(countLoops);
+//  Serial.println("ReceivedValue-");
+//  Serial.println(ReceivedValue);
   if(countLoops < 10 and checkStoplicht == false)
   {
+    Serial.println("hierin1");
+      Serial.println(ReceivedValue);
     processCommand(ReceivedValue);
   }
   else
   {
     if(checkStoplicht == true && ReceivedValue == 12)
     {
-      checkStoplicht == false;
+      Serial.println("hierin2");
+      Serial.println(ReceivedValue);
+      checkStoplicht = false;
       processCommand(ReceivedValue);
     }
     else
