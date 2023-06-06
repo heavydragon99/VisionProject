@@ -16,10 +16,10 @@ intersectionWait = False
 #bord detected
 LastSign = ""
 signBacklogIndex = 0
-signBacklog = np.full(3, '', dtype=object)
+signBacklog = np.full(5, '', dtype=object)
 
 # Wi-Fi variable
-IP_ADDRESS = '192.168.137.241'
+IP_ADDRESS = '192.168.137.63'
 PORT = 8080
 Connected = True
 
@@ -167,8 +167,10 @@ while True:
                 if i == classes[j]:
                     bordCountArray[j] += 1
                     break
-
-        currentSign = classes[bordCountArray.index(max(bordCountArray))]
+        if bordCountArray[3] > 0:
+            currentSign = classes[3]
+        else:
+            currentSign = classes[bordCountArray.index(max(bordCountArray))]
         #print("Current most detected sign is: " + currentSign)
 
         if(LastSign != currentSign and currentSign != "No Sign"):

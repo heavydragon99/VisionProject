@@ -43,10 +43,10 @@ def classify(image):
     ]  # Retrieve the predicted probability for the highest class
     confidence_percent = max_prob * 100  # Calculate the confidence percentage
 
-    if confidence_percent > 95 and pred != 7:
+    if confidence_percent > 98 and pred != 7 or confidence_percent > 70 and pred == 2:
         sign = classes[pred + 1]
         print("Detected sign is: " + str(sign))
-        print("Percentage it is that bord: " + str(confidence_percent))
+        print("Percentage it is that bord: " + str(confidence_percent)) 
     else:
         sign = classes[0]
     return sign
@@ -203,11 +203,11 @@ def localization(image, min_size_components, similitary_contour_with_circle):
     contours = findContour(binary_image)
     sign = findLargestSign(original_image, contours, similitary_contour_with_circle, 15)
 
-    #cv2.imshow("Binary", binary_image)
     if sign is not None:
-        #cv2.imshow("Cropped", sign)
+        cv2.imshow("Binary", binary_image)
+        cv2.imshow("Cropped", sign)
         height, width = sign.shape[:2]
-        print("Height is:" + str(height) + " Width is: " + str(width))
+        #print("Height is:" + str(height) + " Width is: " + str(width))
         cv2.waitKey(1)
         if height < 40 or width > 80:
             return None
